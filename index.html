@@ -534,16 +534,22 @@
         }
         .joker-btn:not(:disabled):hover { color: var(--color-accent-light); transform: scale(1.1); }
 
-        /* Feedback de Pronósticos */
+        /* =========================================
+           VISTA DE COMPARACIÓN: PREDICCIÓN vs RESULTADO
+           ========================================= */
         .match-feedback {
-            margin-top: 0.8rem; background: #f8fafc; padding: 0.6rem 0.8rem; border-radius: 6px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.4rem;
-            font-size: 0.85rem; font-weight: 700; border: 1px dashed var(--border-color); text-align: center;
+            margin-top: 0.8rem; background: white; padding: 1rem; border-radius: 8px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.8rem;
+            font-size: 0.85rem; font-weight: 700; border: 2px solid var(--border-color); text-align: center;
         }
-        .feedback-exact { color: #065f46; background: #d1fae5; border-color: #34d399; }
-        .feedback-partial { color: #0369a1; background: #e0f2fe; border-color: #38bdf8; }
-        .feedback-miss { color: #9f1239; background: #ffe4e6; border-color: #fb7185; }
-        .feedback-badge { padding: 0.3rem 0.8rem; border-radius: 12px; display:flex; align-items:center; gap:0.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .feedback-exact { color: #8b7500; background: rgba(197, 179, 88, 0.08); border-color: var(--color-accent); }
+        .feedback-partial { color: #10b981; background: rgba(16, 185, 129, 0.08); border-color: #10b981; }
+        .feedback-miss { color: #ef4444; background: rgba(239, 68, 68, 0.08); border-color: #ef4444; }
+        .feedback-badge { padding: 0.5rem 1.2rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 2px 6px rgba(0,0,0,0.05); font-weight: 800; border: 2px solid currentColor; }
+        .feedback-icon { font-size: 2.4rem; line-height: 1; }
+        .feedback-score-row { display: flex; gap: 1rem; align-items: center; justify-content: center; font-size: 0.8rem; flex-wrap: wrap; }
+        .feedback-score-item { background: var(--bg-body); padding: 0.5rem 0.9rem; border-radius: 6px; border-left: 3px solid currentColor; }
+        .feedback-score-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
 
         /* Helpers */
         .text-center { text-align: center; }
@@ -1450,18 +1456,46 @@
                         }
 
                         feedbackEl.innerHTML = `
-                            <span style="color: var(--text-muted)">Marcador Real: <b style="color:var(--text-main)">${real.a} - ${real.b}</b></span>
+                            <div class="feedback-score-row">
+                                <div class="feedback-score-item" style="color:#0369a1">
+                                    <div class="feedback-score-label">Tu Pronóstico</div>
+                                    <div style="font-size:1.1rem; font-weight:900">${pred.a} - ${pred.b}</div>
+                                </div>
+                                <div style="color:var(--text-muted); font-weight:800;">vs</div>
+                                <div class="feedback-score-item" style="color:#f59e0b">
+                                    <div class="feedback-score-label">Resultado Real</div>
+                                    <div style="font-size:1.1rem; font-weight:900">${real.a} - ${real.b}</div>
+                                </div>
+                            </div>
                             <div class="feedback-badge ${cls}">
-                                <span style="font-size:1.1rem">${icon}</span> ${text} <span style="opacity:0.8; font-weight:900;">(${pts > 0 ? '+'+pts : pts} pts)</span>
+                                <span class="feedback-icon">${icon}</span> 
+                                <div style="text-align:left">
+                                    <div>${text}</div>
+                                    <div style="opacity:0.9; font-size:0.75rem; font-weight:700">${pts > 0 ? '+'+pts : pts} puntos</div>
+                                </div>
                             </div>
                         `;
                         feedbackEl.classList.remove('hidden');
                     } else if (real) {
                         // Caso donde el partido se jugó pero el participante no lo pronosticó
                         feedbackEl.innerHTML = `
-                            <span style="color: var(--text-muted)">Marcador Real: <b style="color:var(--text-main)">${real.a} - ${real.b}</b></span>
+                            <div class="feedback-score-row">
+                                <div class="feedback-score-item" style="color:#9ca3af">
+                                    <div class="feedback-score-label">Tu Pronóstico</div>
+                                    <div style="font-size:1.1rem; font-weight:900">-</div>
+                                </div>
+                                <div style="color:var(--text-muted); font-weight:800;">vs</div>
+                                <div class="feedback-score-item" style="color:#f59e0b">
+                                    <div class="feedback-score-label">Resultado Real</div>
+                                    <div style="font-size:1.1rem; font-weight:900">${real.a} - ${real.b}</div>
+                                </div>
+                            </div>
                             <div class="feedback-badge feedback-miss">
-                                <span style="font-size:1.1rem">❌</span> Sin pronóstico <span style="opacity:0.8; font-weight:900;">(0 pts)</span>
+                                <span class="feedback-icon">❌</span>
+                                <div style="text-align:left">
+                                    <div>Sin Pronóstico</div>
+                                    <div style="opacity:0.9; font-size:0.75rem; font-weight:700">+0 puntos</div>
+                                </div>
                             </div>
                         `;
                         feedbackEl.classList.remove('hidden');
