@@ -737,6 +737,19 @@
             /* Ajustes para evitar cortes horizontales (Overflow) en Widgets */
             .main-container { padding: 0 0.4rem; }
             .card { padding: 1rem; width: 100%; box-sizing: border-box; }
+            
+            /* Reordenar elementos en móviles: tabla y simulador primero en la vista leaderboard */
+            #view-leaderboard .card {
+                display: flex;
+                flex-direction: column;
+            }
+            #view-leaderboard .card-header { order: 0; }
+            #view-leaderboard .table-wrapper { order: 1; }
+            #view-leaderboard .simulator-toggle-container { order: 2; }
+            #view-leaderboard .simulator-only { order: 3; }
+            #view-leaderboard .widgets-grid { order: 4; }
+            #view-leaderboard .rules-container { order: 5; }
+            
             .widgets-grid { gap: 1rem; }
             
             .dashboard-widget, .prize-widget, .countdown-widget { padding: 0.8rem; width: 100%; box-sizing: border-box; }
