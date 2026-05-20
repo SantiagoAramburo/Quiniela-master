@@ -253,21 +253,6 @@
             flex-shrink: 0;
         }
         
-        .hero-match .team { 
-            flex: 1; font-size: 0.95rem; font-weight: 800; 
-            display: flex; align-items: center; gap: 0.6rem;
-            min-width: 0; 
-        }
-        .hero-match .team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .hero-match .team.left { justify-content: flex-start; text-align: left; } 
-        .hero-match .team.right { justify-content: flex-end; text-align: right; }
-        
-        .hero-match .score-badge {
-            flex: 0 0 auto; background: white; color: var(--color-primary-dark); 
-            font-size: 1.2rem; padding: 0.2rem 0.6rem; border-radius: 6px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 900; letter-spacing: 1px;
-        }
-        
         /* Contenedor escrolleable interno */
         .history-matches-wrapper {
             flex-grow: 1; 
@@ -283,11 +268,33 @@
         .history-matches-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .history-matches-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+        /* Diseño de Marcadores Intactos */
+        .hero-match .score-badge {
+            background: white; color: var(--color-primary-dark); 
+            font-size: 1.2rem; padding: 0.2rem 0.6rem; border-radius: 6px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: 900; letter-spacing: 1px; flex: 0 0 auto;
+        }
+
         .latest-match-card {
             background: white; border: 1px solid var(--border-color); border-radius: 6px;
             padding: 0.6rem 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 4px solid #cbd5e1; flex-shrink: 0;
         }
+
+        .latest-match-card .score-badge {
+            flex: 0 0 auto; background: #e2e8f0; color: var(--text-main);
+            font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.9rem;
+        }
+
+        /* Alineación Flexbox Banderas (Alineados a los lados, Gap de 0.6rem) */
+        .hero-match .team { 
+            flex: 1; font-size: 0.95rem; font-weight: 800; 
+            display: flex; align-items: center; gap: 0.6rem;
+            min-width: 0;
+        }
+        .hero-match .team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .hero-match .team.left { justify-content: flex-start; text-align: left; } 
+        .hero-match .team.right { justify-content: flex-end; text-align: right; }
         
         .latest-match-card .team {
             flex: 1; font-weight: 600; font-size: 0.85rem; color: var(--text-muted);
@@ -298,9 +305,9 @@
         .latest-match-card .team.left { justify-content: flex-start; text-align: left; }
         .latest-match-card .team.right { justify-content: flex-end; text-align: right; }
         
-        .latest-match-card .score-badge {
-            flex: 0 0 auto; background: #e2e8f0; color: var(--text-main);
-            font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.9rem;
+        .team-flag {
+            display: block; width: 24px; height: 18px; border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2); flex-shrink: 0;
         }
 
         .upcoming-match-card {
@@ -426,10 +433,22 @@
         .leaderboard-table th:nth-child(2) { text-align: left; }
         .leaderboard-table td { padding: 1rem; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600; }
         .leaderboard-table td:nth-child(2) { 
-            text-align: left; font-size: 1.1rem; color: var(--text-main); cursor: pointer;
-            transition: color 0.2s;
+            text-align: left; font-size: 1.1rem; color: var(--text-main);
         }
-        .leaderboard-table td:nth-child(2):hover { color: var(--color-primary); text-decoration: underline; }
+        
+        /* Nombre de jugador clickeable */
+        .player-name-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--color-primary); font-weight: 800;
+            padding: 0.4rem 0.8rem; border-radius: 6px;
+            background: rgba(0, 104, 71, 0.05); border: 1px dashed var(--color-primary);
+            transition: all 0.2s; cursor: pointer;
+        }
+        .player-name-link:hover {
+            background: var(--color-primary); color: white; border-style: solid;
+            transform: scale(1.02); box-shadow: 0 4px 10px rgba(0, 104, 71, 0.2);
+        }
+
         .leaderboard-table tr:hover { background: #f8fafc; }
         .leaderboard-table tr:first-child td { background: rgba(197, 179, 88, 0.1); }
         .pts-total { color: var(--color-secondary); font-weight: 900; font-size: 1.3rem; }
@@ -445,23 +464,33 @@
         .trend-down { color: #ef4444; }
         .trend-flat { color: #9ca3af; }
         
+        /* Racha rediseñada con número */
         .streak-fire {
-            display: inline-block;
-            font-size: 1.2rem;
-            margin-left: 0.5rem;
-            animation: flicker 1.5s infinite alternate;
-        }
-        
-        .streak-sniper {
-            display: inline-block;
-            font-size: 1.2rem;
-            margin-left: 0.5rem;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+            font-size: 0.8rem; font-weight: 900; color: #ea580c;
+            background: #ffedd5; padding: 0.2rem 0.6rem; border-radius: 12px;
+            border: 1px solid #fdba74; margin-left: 0.5rem;
+            box-shadow: 0 2px 4px rgba(234, 88, 12, 0.2);
+            animation: pulse-fire 2s infinite alternate;
         }
 
-        @keyframes flicker {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.2); opacity: 1; }
+        @keyframes pulse-fire {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); }
+            100% { transform: scale(1.05); box-shadow: 0 0 8px 2px rgba(234, 88, 12, 0); }
         }
+
+        /* Botón Estrella (Comodín) RESTAURADO */
+        .joker-btn {
+            background: none; border: none; font-size: 1.3rem; cursor: pointer;
+            color: #d1d5db; transition: all 0.2s; padding: 0 0 0 0.5rem; outline: none; line-height: 1; flex-shrink: 0;
+        }
+        .joker-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+        .joker-btn.active-joker { 
+            color: var(--color-accent); 
+            transform: scale(1.2) rotate(15deg); 
+            text-shadow: 0 0 8px rgba(197, 179, 88, 0.6); 
+        }
+        .joker-btn:not(:disabled):hover { color: var(--color-accent-light); transform: scale(1.1); }
 
         /* Simulator Controls */
         .simulator-toggle-container {
@@ -774,7 +803,7 @@
                             </div>
                         </div>
 
-                        <!-- Widget 3: Cuenta Regresiva (Tamaño Restaurado) -->
+                        <!-- Widget 3: Cuenta Regresiva -->
                         <div class="countdown-widget" id="countdown-container">
                             <div class="countdown-title">⏳ Rumbo al Mundial</div>
                             <div class="countdown-grid">
@@ -971,7 +1000,7 @@
         import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         /* =========================================
-           CONFIGURACIÓN FIREBASE
+           CONFIGURACIÓN FIREBASE Y ESTADOS GLOBALES
            ========================================= */
         const firebaseConfig = {  
   		    apiKey: "AIzaSyCtqwHnLG1g__SRNrC1ZLwnzT21Yi-CN1Y",
@@ -983,8 +1012,21 @@
   		    measurementId: "G-Q8XNF3JFDF"
         };
 
+        let currentMatchCenterTab = 'history';
+        let state = { 
+            users: JSON.parse(localStorage.getItem('qm_users')) || {}, 
+            realResults: JSON.parse(localStorage.getItem('qm_real_results')) || { groups: {} },
+            previousRanks: JSON.parse(localStorage.getItem('qm_prev_ranks')) || {}
+        };
+        let currentUser = "";
+        let isAdmin = false; 
+        let isSimulatorActive = false;
+        let simResults = {}; 
+        
+        let app, auth, db, authUser;
+
         /* =========================================
-           DATOS DEL TORNEO (FASE DE GRUPOS)
+           DATOS DEL TORNEO (FASE DE GRUPOS Y HORARIOS)
            ========================================= */
         const gruposData = {
             A: ["México", "Sudáfrica", "Corea del Sur", "Chequia"],
@@ -1001,9 +1043,6 @@
             L: ["Inglaterra", "Croacia", "Ghana", "Panamá"]
         };
 
-        /* =========================================
-           BASE DE DATOS MANUAL DE HORARIOS OFICIALES
-           ========================================= */
         const officialSchedule = {
             "México-Sudáfrica": "2026-06-11T13:00:00-06:00",
             "Corea del Sur-Chequia": "2026-06-11T20:00:00-06:00",
@@ -1103,22 +1142,6 @@
             }
         }
 
-        /* ESTADO DE LA APLICACIÓN Y BASE DE DATOS EN LA NUBE */
-        let currentMatchCenterTab = 'history';
-        let state = { 
-            users: JSON.parse(localStorage.getItem('qm_users')) || {}, 
-            realResults: JSON.parse(localStorage.getItem('qm_real_results')) || { groups: {} },
-            previousRanks: JSON.parse(localStorage.getItem('qm_prev_ranks')) || {}
-        };
-        let currentUser = "";
-        let isAdmin = false; 
-        
-        // Estado del Simulador
-        let isSimulatorActive = false;
-        let simResults = {}; // Copia temporal de resultados
-        
-        let app, auth, db, authUser;
-
         if (firebaseConfig.apiKey) {
             try {
                 app = initializeApp(firebaseConfig);
@@ -1169,7 +1192,6 @@
                 localStorage.setItem('qm_real_results', JSON.stringify(state.realResults));
                 localStorage.setItem('qm_prev_ranks', JSON.stringify(state.previousRanks));
                 
-                // Si el simulador no está activo, actualizamos la tabla normal
                 if (!isSimulatorActive) {
                     updateLeaderboard();
                     if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminGroups();
@@ -1178,7 +1200,7 @@
         }
 
         /* =========================================
-           EXPOSICIÓN DE FUNCIONES GLOBALES
+           EXPOSICIÓN DE FUNCIONES GLOBALES (VENTANA)
            ========================================= */
         window.toggleAdmin = toggleAdmin;
         window.switchTab = switchTab;
@@ -1203,44 +1225,36 @@
                 document.body.classList.add('simulator-mode');
                 btn.classList.add('active');
                 btn.innerHTML = '🧪 Apagar Simulador';
-                // Clonar resultados reales a la memoria temporal
                 simResults = JSON.parse(JSON.stringify(state.realResults.groups || {}));
                 
-                // Forzar ir a la pestaña Admin para que vean el simulador
                 if(!isAdmin && document.getElementById('view-admin').classList.contains('hidden')){
                     switchTab('admin');
                 }
-                renderAdminGroups(); // Renderizar inputs como sim-input
+                renderAdminGroups(); 
             } else {
                 document.body.classList.remove('simulator-mode');
                 btn.classList.remove('active');
                 btn.innerHTML = '🧪 Activar Modo Simulador';
                 simResults = {};
-                renderAdminGroups(); // Restaurar inputs normales
+                renderAdminGroups(); 
             }
             updateLeaderboard();
         }
 
-        // Se llama cada vez que el usuario teclea algo en Modo Simulador
         function handleSimInput(matchId, team, val) {
             if(!isSimulatorActive) return;
-            
             if(!simResults[matchId]) simResults[matchId] = {};
             if(val !== "") {
                 simResults[matchId][team] = parseInt(val);
             } else {
                 delete simResults[matchId][team];
             }
-            
-            // Re-calcular la tabla en vivo
             updateLeaderboard();
         }
 
-        // Helper para obtener los resultados a usar (Reales o Simulados)
         function getActiveResults() {
             return isSimulatorActive ? simResults : (state.realResults.groups || {});
         }
-
 
         function toggleMatchCenter(tab) {
             currentMatchCenterTab = tab;
@@ -1332,7 +1346,6 @@
                     }).join('');
                     html += `</div>`;
                 }
-
                 html += `</div>`;
                 container.innerHTML = html;
                 
@@ -1421,6 +1434,17 @@
             if(tab === 'pronosticos') updateUserDropdown();
         }
 
+        function updateUserDropdown() {
+            const select = document.getElementById('user-select');
+            select.innerHTML = '<option value="">-- Selecciona un participante --</option>';
+            Object.keys(state.users).sort().forEach(name => {
+                select.innerHTML += `<option value="${name}">${name}</option>`;
+            });
+            if(currentUser && state.users[currentUser]) {
+                select.value = currentUser;
+            }
+        }
+
         function loadSelectedUser() {
             const selectedName = document.getElementById('user-select').value;
             if (!selectedName) {
@@ -1432,6 +1456,99 @@
             currentUser = selectedName;
             document.getElementById('new-user-input').value = "";
             renderUserPanel();
+        }
+
+        function renderUserPanel() {
+            const container = document.getElementById('pred-grupos');
+            if(!currentUser) return;
+            
+            document.getElementById('prediction-area').classList.remove('hidden');
+            document.getElementById('btn-delete-user').classList.remove('hidden');
+            
+            const userData = state.users[currentUser] || { groups: {} };
+            const activeRes = getActiveResults();
+            
+            let html = '';
+            for (const [grupo, equipos] of Object.entries(gruposData)) {
+                const groupMatches = matchesGrupos.filter(m => m.grupo === grupo);
+                html += `<div class="group-card"><div class="group-header">GRUPO ${grupo}</div><div class="match-row-wrapper">`;
+                
+                groupMatches.forEach(m => {
+                    const pred = (userData.groups && userData.groups[m.id]) ? userData.groups[m.id] : { a: '', b: '', joker: false };
+                    const real = activeRes[m.id];
+                    const isPlayed = real && real.a !== undefined;
+                    const isDisabled = isPlayed || !isAdmin;
+                    const disAttr = isDisabled ? 'disabled' : '';
+                    const jokerClass = pred.joker ? 'active-joker' : '';
+                    
+                    let feedbackHTML = '';
+                    if (isPlayed) {
+                        if (pred.a === '' || pred.b === '') {
+                             feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-miss">❌ No participó (0 pts)</div></div>`;
+                        } else {
+                            if (pred.a === real.a && pred.b === real.b) {
+                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-exact">🎯 Exacto (+${pred.joker ? '8' : '4'} pts)</div></div>`;
+                            } else if ((pred.a > pred.b && real.a > real.b) || (pred.a < pred.b && real.a < real.b) || (pred.a === pred.b && real.a === real.b)) {
+                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-result">✔️ Resultado (+${pred.joker ? '4' : '2'} pts)</div></div>`;
+                            } else {
+                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-miss">${pred.joker ? '❌ Comodín Fallido (-1 pts)' : '❌ Falló (0 pts)'}</div></div>`;
+                            }
+                        }
+                    }
+
+                    html += `
+                    <div class="match-row">
+                        <div class="match-row-main">
+                            <div class="team-name right">${m.teamA}</div>
+                            <div class="score-inputs">
+                                <input type="number" id="pred-${m.id}-a" class="score-input" value="${pred.a}" min="0" ${disAttr}>
+                                <span class="vs-badge">VS</span>
+                                <input type="number" id="pred-${m.id}-b" class="score-input" value="${pred.b}" min="0" ${disAttr}>
+                            </div>
+                            <div class="team-name">${m.teamB}</div>
+                            <button id="joker-btn-${m.id}" class="joker-btn joker-group-${grupo} ${jokerClass}" onclick="toggleJoker('${m.id}', '${grupo}')" ${disAttr} title="Usar Comodín de Grupo">★</button>
+                        </div>
+                        ${feedbackHTML}
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderAdminGroups() {
+            const container = document.getElementById('admin-grupos');
+            let html = '';
+            
+            const activeRes = getActiveResults();
+            const inputClass = isSimulatorActive ? 'score-input sim-input' : 'score-input';
+
+            for (const [grupo, equipos] of Object.entries(gruposData)) {
+                const groupMatches = matchesGrupos.filter(m => m.grupo === grupo);
+                html += `<div class="group-card"><div class="group-header">GRUPO ${grupo}</div><div class="match-row-wrapper">`;
+                
+                groupMatches.forEach(m => {
+                    const real = activeRes[m.id] || { a: '', b: '' };
+                    const disAttr = (!isAdmin && !isSimulatorActive) ? 'disabled' : '';
+                    const simOnKeyUpA = isSimulatorActive ? `onkeyup="handleSimInput('${m.id}', 'a', this.value)" onchange="handleSimInput('${m.id}', 'a', this.value)"` : '';
+                    const simOnKeyUpB = isSimulatorActive ? `onkeyup="handleSimInput('${m.id}', 'b', this.value)" onchange="handleSimInput('${m.id}', 'b', this.value)"` : '';
+                    
+                    html += `
+                    <div class="match-row">
+                        <div class="match-row-main">
+                            <div class="team-name right">${m.teamA}</div>
+                            <div class="score-inputs">
+                                <input type="number" id="real-${m.id}-a" class="${inputClass}" value="${real.a}" min="0" ${disAttr} ${simOnKeyUpA}>
+                                <span class="vs-badge">VS</span>
+                                <input type="number" id="real-${m.id}-b" class="${inputClass}" value="${real.b}" min="0" ${disAttr} ${simOnKeyUpB}>
+                            </div>
+                            <div class="team-name">${m.teamB}</div>
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
         }
 
         async function createNewUser() {
@@ -1465,6 +1582,66 @@
             updateLeaderboard();
         }
 
+        function calculateStandings() {
+            let scores = [];
+            const activeRes = getActiveResults();
+            
+            for (const [name, userData] of Object.entries(state.users)) {
+                let pts = 0;
+                let exactos = 0;
+                let parciales = 0;
+                let fallos = 0;
+                
+                let rachaActual = 0;
+                let rachaMaxima = 0;
+                
+                // Ordenar partidos para calcular racha cronológicamente
+                const playedMatches = matchesGrupos
+                    .filter(m => activeRes[m.id] && activeRes[m.id].a !== undefined)
+                    .sort((a, b) => new Date(a.dateIso) - new Date(b.dateIso));
+                    
+                playedMatches.forEach(m => {
+                    const real = activeRes[m.id];
+                    const pred = userData.groups ? userData.groups[m.id] : null;
+                    
+                    if (pred && pred.a !== undefined && pred.b !== undefined) {
+                        const isJoker = pred.joker || false;
+                        let matchPts = 0;
+                        let hitExact = false;
+                        
+                        if (pred.a === real.a && pred.b === real.b) {
+                            matchPts = isJoker ? 8 : 4;
+                            exactos++;
+                            hitExact = true;
+                        } else if (
+                            (pred.a > pred.b && real.a > real.b) || 
+                            (pred.a < pred.b && real.a < real.b) || 
+                            (pred.a === pred.b && real.a === real.b)
+                        ) {
+                            matchPts = isJoker ? 4 : 2;
+                            parciales++;
+                        } else {
+                            if(isJoker) matchPts = -1;
+                            fallos++;
+                        }
+                        pts += matchPts;
+                        
+                        if (hitExact) {
+                            rachaActual++;
+                            if (rachaActual > rachaMaxima) rachaMaxima = rachaActual;
+                        } else {
+                            rachaActual = 0;
+                        }
+                    }
+                });
+                
+                scores.push({ name, pts, exactos, parciales, fallos, rachaActual });
+            }
+            
+            scores.sort((a, b) => b.pts - a.pts || b.exactos - a.exactos);
+            return scores;
+        }
+
         function getCurrentRankings() {
             const scores = calculateStandings();
             let ranks = {};
@@ -1481,7 +1658,6 @@
             matchesGrupos.forEach(m => {
                 const valA = document.getElementById(`pred-${m.id}-a`).value;
                 const valB = document.getElementById(`pred-${m.id}-b`).value;
-                
                 const isJoker = document.getElementById(`joker-btn-${m.id}`)?.classList.contains('active-joker') || false;
 
                 if(valA !== "" && valB !== "") {
@@ -1509,11 +1685,10 @@
         async function saveRealResults() {
             if(!isAdmin) return alert("Solo el administrador puede guardar los resultados oficiales.");
             
-            // Si estaba en modo simulador, pasamos los datos del simulador al estado real
             if(isSimulatorActive) {
                 if(confirm("¿Estás seguro de que quieres publicar los resultados del simulador como OFICIALES?")) {
                     state.realResults.groups = JSON.parse(JSON.stringify(simResults));
-                    toggleSimulator(); // Apagar simulador
+                    toggleSimulator(); 
                 } else {
                     return;
                 }
@@ -1565,248 +1740,10 @@
                         console.error("Error eliminando perfil de la nube.", e);
                     }
                 }
-                
-                document.getElementById('new-user-input').value = '';
-                document.getElementById('prediction-area').classList.add('hidden');
-                document.getElementById('btn-delete-user').classList.add('hidden');
-                currentUser = "";
                 updateUserDropdown();
+                loadSelectedUser();
                 updateLeaderboard();
             }
-        }
-
-        /* =========================================
-           FUNCIONES INTERNAS DE RENDERIZADO
-           ========================================= */
-        function generateMatchHTML(match, context) {
-            const prefix = context === 'admin' ? 'real' : 'pred';
-            let disabledAttr = isAdmin ? '' : 'disabled';
-            let simInputClass = '';
-            let onchangeAttr = '';
-            
-            // Lógica especial para inputs en modo Simulador
-            if(context === 'admin' && isSimulatorActive) {
-                disabledAttr = ''; // Todos pueden simular
-                simInputClass = 'sim-input';
-                onchangeAttr = `onkeyup="handleSimInput('${match.id}', 'a', document.getElementById('real-${match.id}-a').value); handleSimInput('${match.id}', 'b', document.getElementById('real-${match.id}-b').value)" onchange="handleSimInput('${match.id}', 'a', document.getElementById('real-${match.id}-a').value); handleSimInput('${match.id}', 'b', document.getElementById('real-${match.id}-b').value)"`;
-            }
-
-            let jokerHtml = '';
-            let feedbackHtml = '';
-            if (context === 'user') {
-                jokerHtml = `<button type="button" class="joker-btn joker-group-${match.grupo}" id="joker-btn-${match.id}" onclick="toggleJoker('${match.id}', '${match.grupo}')" ${disabledAttr} title="Comodín de Oro">★</button>`;
-                feedbackHtml = `<div id="feedback-${match.id}" class="match-feedback hidden"></div>`;
-            }
-
-            return `
-            <div class="match-row">
-                <div class="match-row-main">
-                    <div class="team-name right" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;">
-                        ${match.teamA}
-                    </div>
-                    <div class="score-inputs">
-                        <input type="number" id="${prefix}-${match.id}-a" min="0" class="score-input ${simInputClass}" ${disabledAttr} ${onchangeAttr}>
-                        <span class="vs-badge">vs</span>
-                        <input type="number" id="${prefix}-${match.id}-b" min="0" class="score-input ${simInputClass}" ${disabledAttr} ${onchangeAttr}>
-                    </div>
-                    <div class="team-name" style="display:flex; justify-content:space-between; align-items:center; min-width:0;">
-                        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">
-                            ${match.teamB}
-                        </span>
-                        ${jokerHtml}
-                    </div>
-                </div>
-                ${feedbackHtml}
-            </div>`;
-        }
-
-        function renderGroups(containerId, context) {
-            const container = document.getElementById(containerId);
-            let html = '';
-            for (const grupo in gruposData) {
-                const groupMatches = matchesGrupos.filter(m => m.grupo === grupo);
-                html += `
-                    <div class="group-card">
-                        <div class="group-header">Grupo ${grupo}</div>
-                        <div>${groupMatches.map(m => generateMatchHTML(m, context)).join('')}</div>
-                    </div>`;
-            }
-            container.innerHTML = html;
-        }
-
-        function renderAdminGroups() {
-            renderGroups('admin-grupos', 'admin');
-            
-            const activeRes = getActiveResults();
-            
-            matchesGrupos.forEach(m => {
-                if(activeRes && activeRes[m.id]) {
-                    document.getElementById(`real-${m.id}-a`).value = activeRes[m.id].a !== undefined ? activeRes[m.id].a : '';
-                    document.getElementById(`real-${m.id}-b`).value = activeRes[m.id].b !== undefined ? activeRes[m.id].b : '';
-                }
-            });
-        }
-
-        function updateUserDropdown() {
-            const select = document.getElementById('user-select');
-            select.innerHTML = '<option value="">-- Selecciona un participante --</option>';
-            
-            const users = Object.keys(state.users).sort();
-            users.forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                select.appendChild(option);
-            });
-            
-            if (currentUser && state.users[currentUser]) {
-                select.value = currentUser;
-            }
-        }
-
-        function renderUserPanel() {
-            if(!state.users[currentUser] || !state.users[currentUser].groups) {
-                if(!state.users[currentUser]) state.users[currentUser] = {};
-                state.users[currentUser].groups = {};
-            }
-
-            renderGroups('pred-grupos', 'user');
-            
-            if (isAdmin) document.getElementById('btn-delete-user').classList.remove('hidden');
-            else document.getElementById('btn-delete-user').classList.add('hidden');
-
-            const uData = state.users[currentUser];
-            const activeRes = getActiveResults();
-
-            matchesGrupos.forEach(m => {
-                const pred = uData.groups[m.id];
-                const real = activeRes ? activeRes[m.id] : null;
-                const feedbackEl = document.getElementById(`feedback-${m.id}`);
-
-                if(pred) {
-                    document.getElementById(`pred-${m.id}-a`).value = pred.a;
-                    document.getElementById(`pred-${m.id}-b`).value = pred.b;
-                    
-                    if (pred.joker) {
-                        const btn = document.getElementById(`joker-btn-${m.id}`);
-                        if (btn) btn.classList.add('active-joker');
-                    }
-                } else {
-                    document.getElementById(`pred-${m.id}-a`).value = '';
-                    document.getElementById(`pred-${m.id}-b`).value = '';
-                    const btn = document.getElementById(`joker-btn-${m.id}`);
-                    if (btn) btn.classList.remove('active-joker');
-                }
-
-                if (feedbackEl) {
-                    if (real && real.a !== undefined && real.b !== undefined) {
-                        if (pred && pred.a !== undefined && pred.b !== undefined && !isNaN(pred.a) && !isNaN(pred.b)) {
-                            const pts = calcMatchPoints(pred, real);
-                            let cls = 'badge-miss';
-                            let text = '❌ Falló (0 pts)';
-                            
-                            if (pts === 4 || pts === 8) { cls = 'badge-exact'; text = `🎯 Marcador Exacto (+${pts} pts)`; }
-                            else if (pts === 2 || pts === 4) { cls = 'badge-result'; text = `✔️ Acertó Resultado (+${pts} pts)`; }
-                            else if (pts === -1) { cls = 'badge-miss'; text = '❌ Comodín Fallido (-1 pts)'; }
-
-                            feedbackEl.innerHTML = `<span class="real-score-label">Marcador Oficial: ${real.a} - ${real.b}</span><div class="badge ${cls}">${text}</div>`;
-                        } else {
-                            feedbackEl.innerHTML = `<span class="real-score-label">Marcador Oficial: ${real.a} - ${real.b}</span><div class="badge badge-miss">❌ No participó (0 pts)</div>`;
-                        }
-                        feedbackEl.classList.remove('hidden');
-                    } else {
-                        feedbackEl.innerHTML = '';
-                        feedbackEl.classList.add('hidden');
-                    }
-                }
-            });
-
-            document.getElementById('prediction-area').classList.remove('hidden');
-        }
-
-        /* =========================================
-           CÁLCULO DE PUNTOS, WIDGETS Y LEADERBOARD
-           ========================================= */
-        function calcMatchPoints(pred, real) {
-            if (!real || pred.a === undefined || pred.b === undefined || isNaN(pred.a) || isNaN(pred.b)) return 0;
-            const pA = pred.a, pB = pred.b, rA = real.a, rB = real.b;
-            const multiplier = pred.joker ? 2 : 1;
-
-            if (pA === rA && pB === rB) return 4 * multiplier;
-            if ((pA > pB && rA > rB) || (pA < pB && rA < rB) || (pA === pB && rA === rB)) return 2 * multiplier;
-            if (pred.joker) return -1;
-            return 0;
-        }
-
-        function calculateStandings() {
-            let scores = [];
-            const activeRes = getActiveResults();
-
-            for (let name in state.users) {
-                let pts = 0;
-                let exactos = 0;
-                let parciales = 0;
-                let fallos = 0;
-                let rachaExactos = 0; // Para el icono de 🔥
-                let rachaMaxima = 0;
-                
-                const uData = state.users[name];
-                
-                if (uData.groups && activeRes) {
-                    // Ordenamos partidos por fecha para calcular la racha cronológicamente
-                    const sortedMatches = matchesGrupos.slice().sort((a,b) => new Date(a.dateIso) - new Date(b.dateIso));
-                    
-                    for (let m of sortedMatches) {
-                        const mId = m.id;
-                        if(activeRes[mId] && activeRes[mId].a !== undefined) {
-                            const pred = uData.groups[mId] || {};
-                            const real = activeRes[mId];
-                            
-                            const matchPts = calcMatchPoints(pred, real);
-                            pts += matchPts;
-                            
-                            if (matchPts === 4 || matchPts === 8) {
-                                exactos++;
-                                rachaExactos++;
-                                if(rachaExactos > rachaMaxima) rachaMaxima = rachaExactos;
-                            } else if (matchPts === 2 || matchPts === 4) {
-                                parciales++;
-                                rachaExactos = 0; // Corta la racha de exactos
-                            } else {
-                                fallos++;
-                                rachaExactos = 0; // Corta la racha
-                            }
-                        }
-                    }
-                }
-                
-                // Lógica del Francotirador (El único que le atinó a un marcador exacto en todo el torneo)
-                // Se evalúa después en un segundo pase
-                scores.push({ name, pts, exactos, parciales, fallos, rachaActual: rachaMaxima, isSniper: false });
-            }
-            
-            // Calcular francotirador 🎯 (Si en algun partido hubo un solo ganador exacto, él recibe el badge)
-            if(activeRes) {
-                matchesGrupos.forEach(m => {
-                    const mId = m.id;
-                    if(activeRes[mId] && activeRes[mId].a !== undefined) {
-                        let aciertosExactos = [];
-                        for(let name in state.users) {
-                            const p = state.users[name].groups ? state.users[name].groups[mId] : null;
-                            if(p && p.a === activeRes[mId].a && p.b === activeRes[mId].b) {
-                                aciertosExactos.push(name);
-                            }
-                        }
-                        if(aciertosExactos.length === 1) { // ¡Solo un participante le atinó!
-                            const userObj = scores.find(s => s.name === aciertosExactos[0]);
-                            if(userObj) userObj.isSniper = true;
-                        }
-                    }
-                });
-            }
-
-            scores.sort((a, b) => b.pts - a.pts || b.exactos - a.exactos);
-            return scores;
         }
 
         function updatePrizePool() {
@@ -1854,8 +1791,6 @@
 
             tbody.innerHTML = scores.map((s, i) => {
                 const currentRank = i + 1;
-                // Si el simulador esta activo, comparamos contra la posicion real (index)
-                // Si no, comparamos contra la foto guardada en la base de datos
                 const previousRank = isSimulatorActive ? 
                                     (Object.keys(state.previousRanks).length > 0 ? state.previousRanks[s.name] : currentRank) : 
                                     (state.previousRanks ? state.previousRanks[s.name] : null);
@@ -1873,10 +1808,8 @@
                 }
 
                 const medal = i === 0 ? '🏆' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="color:#9ca3af; font-weight:800;">${currentRank}</span>`;
-                
                 let badges = "";
-                if(s.rachaActual >= 2) badges += `<span class="streak-fire" title="¡En Racha! ${s.rachaActual} marcadores exactos seguidos">🔥</span>`;
-                if(s.isSniper) badges += `<span class="streak-sniper" title="Francotirador: Único en atinarle al marcador de un partido">🎯</span>`;
+                if(s.rachaActual >= 2) badges += `<span class="streak-fire" title="¡En Racha! ${s.rachaActual} marcadores exactos seguidos">🔥 x${s.rachaActual}</span>`;
 
                 return `
                 <tr>
@@ -1886,7 +1819,14 @@
                             <span class="${trendClass}" title="${trendTitle}" style="display:inline-flex; align-items:center; justify-content:center;">${trendIcon}</span>
                         </div>
                     </td>
-                    <td onclick="openPlayerModal('${s.name}', ${currentRank})" title="Ver Estadísticas">${s.name} ${badges}</td>
+                    <td onclick="openPlayerModal('${s.name}', ${currentRank})" title="Ver Estadísticas de ${s.name}">
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span class="player-name-link">
+                                ${s.name}
+                            </span>
+                            ${badges}
+                        </div>
+                    </td>
                     <td>
                         ${s.exactos > 0 ? `<span class="exact-badge">🎯 ${s.exactos}</span>` : `<span style="color:#d1d5db;">-</span>`}
                     </td>
@@ -1921,7 +1861,6 @@
             document.getElementById('leg-partial').innerText = `${playerStats.parciales} Resultados`;
             document.getElementById('leg-miss').innerText = `${playerStats.fallos} Fallos`;
 
-            // Configurar WhatsApp
             const medal = rank === 1 ? '🏆' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '⚽';
             let waText = `¡Voy en la Posición #${rank} ${medal} en la Quiniela Master 2026 con ${playerStats.pts} puntos!\n\nLlevo ${playerStats.exactos} marcadores exactos 🎯 y una efectividad del ${efectividad}% 🔥.\n\n¿Quién me alcanza? 👀`;
             document.getElementById('btn-share-wa').href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
