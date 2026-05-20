@@ -1252,6 +1252,14 @@
             const btn = document.getElementById('sim-toggle-btn');
             
             if (isSimulatorActive) {
+                // NUEVO: Al encender el simulador, congelar las posiciones actuales
+                let currentRealRanking = calculateStandings().map((s, i) => ({ name: s.name, rank: i + 1 }));
+                let freezeRanking = {};
+                currentRealRanking.forEach(u => {
+                    freezeRanking[u.name] = u.rank;
+                });
+                state.previousRanks = freezeRanking;
+                
                 document.body.classList.add('simulator-mode');
                 btn.classList.add('active');
                 btn.innerHTML = '🧪 Apagar Simulador';
@@ -1716,6 +1724,9 @@
         async function saveRealResults() {
             if(!isAdmin) return alert("Solo el administrador puede guardar los resultados oficiales.");
             
+            // NUEVO: Tomar fotografía del ranking ANTES de hacer cambios
+            state.previousRanks = getCurrentRankings();
+            
             if(isSimulatorActive) {
                 if(confirm("¿Estás seguro de que quieres publicar los resultados del simulador como OFICIALES?")) {
                     state.realResults.groups = JSON.parse(JSON.stringify(simResults));
@@ -1736,7 +1747,6 @@
                 });
             }
 
-            state.previousRanks = getCurrentRankings();
             localStorage.setItem('qm_real_results', JSON.stringify(state.realResults));
             localStorage.setItem('qm_prev_ranks', JSON.stringify(state.previousRanks));
 
