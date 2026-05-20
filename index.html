@@ -30,7 +30,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { 
             max-width: 100vw; 
-            overflow-x: hidden; /* Previene el desbordamiento molesto en móviles */
+            overflow-x: hidden; 
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -44,7 +44,7 @@
         .hidden { display: none !important; }
 
         /* =========================================
-           MODO ADMINISTRADOR (SOLO LECTURA POR DEFECTO)
+           MODO ADMINISTRADOR Y SIMULADOR
            ========================================= */
         body:not(.admin-mode) .admin-only {
             display: none !important;
@@ -58,6 +58,10 @@
             cursor: not-allowed;
             border-color: #d1d5db;
         }
+        
+        body.simulator-mode .simulator-only { display: block !important; }
+        body.simulator-mode .simulator-hide { display: none !important; }
+        body:not(.simulator-mode) .simulator-only { display: none !important; }
 
         /* =========================================
            BARRA DE NAVEGACIÓN (NAVBAR)
@@ -174,12 +178,10 @@
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            /* Límite fijo para Móviles: obliga a activar el scroll interno */
             height: 450px; 
             min-height: 0; 
         }
         
-        /* ESTA REGLA CONTROLA QUE NO ESTIRE LA BOLSA EN COMPUTADORA */
         @media (min-width: 850px) {
             .dashboard-widget {
                 height: auto;
@@ -401,7 +403,7 @@
         .table-wrapper { 
             max-height: 350px;
             overflow-y: auto; 
-            overflow-x: auto; /* Solución para desbordamiento en móviles */
+            overflow-x: auto;
             width: 100%;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -423,7 +425,11 @@
         }
         .leaderboard-table th:nth-child(2) { text-align: left; }
         .leaderboard-table td { padding: 1rem; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: 600; }
-        .leaderboard-table td:nth-child(2) { text-align: left; font-size: 1.1rem; color: var(--text-main); }
+        .leaderboard-table td:nth-child(2) { 
+            text-align: left; font-size: 1.1rem; color: var(--text-main); cursor: pointer;
+            transition: color 0.2s;
+        }
+        .leaderboard-table td:nth-child(2):hover { color: var(--color-primary); text-decoration: underline; }
         .leaderboard-table tr:hover { background: #f8fafc; }
         .leaderboard-table tr:first-child td { background: rgba(197, 179, 88, 0.1); }
         .pts-total { color: var(--color-secondary); font-weight: 900; font-size: 1.3rem; }
@@ -433,6 +439,58 @@
             background: rgba(197, 179, 88, 0.2); color: #8b7500; padding: 0.3rem 0.6rem;
             border-radius: 12px; font-size: 0.8rem; font-weight: 800; display: inline-flex;
             align-items: center; gap: 0.3rem; white-space: nowrap;
+        }
+
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-flat { color: #9ca3af; }
+        
+        .streak-fire {
+            display: inline-block;
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+            animation: flicker 1.5s infinite alternate;
+        }
+        
+        .streak-sniper {
+            display: inline-block;
+            font-size: 1.2rem;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Simulator Controls */
+        .simulator-toggle-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+        }
+        
+        .sim-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .sim-toggle.active {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: #a5b4fc;
         }
 
         /* =========================================
@@ -506,7 +564,7 @@
         
         .team-name { 
             flex: 1; font-weight: 700; font-size: 0.95rem; color: var(--text-main); 
-            min-width: 0; /* Previene el desbordamiento en Flexbox */
+            min-width: 0;
         }
         .team-name.right { text-align: right; }
         
@@ -519,6 +577,15 @@
         }
         .score-input::-webkit-outer-spin-button, .score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .score-input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0,104,71,0.2); }
+        
+        /* Estilo input simulador */
+        .sim-input {
+            border-color: #4338ca;
+            background: #e0e7ff;
+            color: #312e81;
+        }
+        .sim-input:focus { box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.2); border-color: #3730a3; }
+
         .vs-badge { font-size: 0.7rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; }
 
         /* Botón Estrella (Comodín) */
@@ -536,14 +603,78 @@
 
         /* Feedback de Pronósticos */
         .match-feedback {
-            margin-top: 0.8rem; background: #f8fafc; padding: 0.6rem 0.8rem; border-radius: 6px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.4rem;
-            font-size: 0.85rem; font-weight: 700; border: 1px dashed var(--border-color); text-align: center;
+            margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed var(--border-color);
+            display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
         }
-        .feedback-exact { color: #065f46; background: #d1fae5; border-color: #34d399; }
-        .feedback-partial { color: #0369a1; background: #e0f2fe; border-color: #38bdf8; }
-        .feedback-miss { color: #9f1239; background: #ffe4e6; border-color: #fb7185; }
-        .feedback-badge { padding: 0.3rem 0.8rem; border-radius: 12px; display:flex; align-items:center; gap:0.4rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .real-score-label {
+            font-size: 0.85rem; color: var(--text-muted); font-weight: 600;
+        }
+        .badge {
+            padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;
+            text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .badge-exact { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-result { background-color: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+        .badge-miss { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* =========================================
+           MODAL DE ESTADÍSTICAS DEL JUGADOR
+           ========================================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; padding: 1rem; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-card {
+            background: white; border-radius: 12px; width: 100%; max-width: 450px;
+            overflow: hidden; transform: translateY(20px); transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .modal-overlay.active .modal-card { transform: translateY(0); }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+            padding: 1.5rem; color: white; position: relative;
+        }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2);
+            border: none; color: white; width: 30px; height: 30px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.4); }
+        
+        .modal-title { font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; gap: 0.5rem; }
+        .modal-subtitle { font-size: 0.9rem; color: var(--color-accent-light); font-weight: 600; margin-top: 0.2rem; }
+        
+        .modal-body { padding: 1.5rem; }
+        
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box {
+            background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 1rem; text-align: center;
+        }
+        .stat-value { font-size: 1.8rem; font-weight: 900; color: var(--color-primary); line-height: 1; margin-bottom: 0.3rem;}
+        .stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        
+        .stat-bar-container { width: 100%; height: 12px; background: #fee2e2; border-radius: 6px; overflow: hidden; display: flex; margin-bottom: 0.5rem; }
+        .stat-bar-exact { background: #10b981; height: 100%; }
+        .stat-bar-partial { background: #3b82f6; height: 100%; }
+        .stat-legend { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
+        .legend-item { display: flex; align-items: center; gap: 0.3rem; }
+        .legend-color { width: 10px; height: 10px; border-radius: 2px; }
+
+        .btn-whatsapp {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            width: 100%; padding: 1rem; background: #25D366; color: white;
+            border: none; border-radius: 8px; font-weight: 800; font-size: 1rem;
+            cursor: pointer; transition: background 0.2s; margin-top: 1.5rem; text-decoration: none;
+        }
+        .btn-whatsapp:hover { background: #128C7E; }
 
         /* Helpers */
         .text-center { text-align: center; }
@@ -551,10 +682,6 @@
         .alert-admin { background: #fef2f2; color: #9b0d1c; padding: 1rem; border-radius: 4px; font-weight: 600; margin-bottom: 1.5rem; border-left: 4px solid var(--color-secondary); }
         .cloud-badge { background: var(--color-accent); color: var(--color-primary-dark); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.3rem; vertical-align: middle; margin-left: 0.5rem;}
         
-        .trend-up { color: #10b981; }
-        .trend-down { color: #ef4444; }
-        .trend-flat { color: #9ca3af; }
-
         /* =========================================
            ADAPTACIONES MÓVILES (Responsivo)
            ========================================= */
@@ -679,6 +806,17 @@
                     </table>
                 </div>
 
+                <!-- SIMULADOR TOGGLE -->
+                <div class="simulator-toggle-container">
+                    <button class="sim-toggle" id="sim-toggle-btn" onclick="toggleSimulator()">
+                        🧪 Activar Modo Simulador
+                    </button>
+                </div>
+                <div class="simulator-only text-center mt-2 text-sm text-indigo-600 font-bold">
+                    ⚠️ Modo Simulador Activo: Los puntos en la tabla son hipotéticos. 
+                    <a href="#" onclick="toggleSimulator(); return false;" class="underline">Apagar</a>
+                </div>
+
                 <!-- REGLAS DE PUNTUACIÓN SIMÉTRICAS -->
                 <div class="rules-container">
                     <div class="rules-title">⚽ Reglas de Puntuación</div>
@@ -755,7 +893,15 @@
                 <strong>🚨 Zona de Administración Activa</strong><br>
                 Ingresa aquí los resultados reales de la Fase de Grupos. Al guardar, se sincronizarán en la nube y se recalcularán los puntos de todos.
             </div>
-            <div class="rules-container" id="guest-admin-msg" style="margin-top:0; margin-bottom: 2rem; border-color:var(--color-secondary); border-left-color:var(--color-secondary); background:#fef2f2; display:none;">
+            
+            <!-- MENSAJE DE SIMULACIÓN -->
+            <div class="rules-container simulator-only" style="margin-top:0; margin-bottom: 2rem; border-color:#4338ca; border-left-color:#4338ca; background:#e0e7ff;">
+                <div class="rules-grid" style="color: #312e81;">
+                    🧪 <strong>Modo Simulador Activo:</strong> Puedes ingresar marcadores falsos aquí. Los resultados no se guardarán, pero la Tabla de Clasificación se actualizará en vivo.
+                </div>
+            </div>
+
+            <div class="rules-container simulator-hide" id="guest-admin-msg" style="margin-top:0; margin-bottom: 2rem; border-color:var(--color-secondary); border-left-color:var(--color-secondary); background:#fef2f2; display:none;">
                 <div class="rules-grid" style="color: var(--color-secondary-dark);">
                     🔒 <strong>Modo Visor:</strong> Aquí puedes ver los resultados reales de los partidos.
                 </div>
@@ -767,7 +913,7 @@
                 <!-- Grupos Admin -->
                 <div id="admin-grupos" class="groups-grid"></div>
 
-                <div class="text-center mt-4 admin-only" style="padding-top: 2rem;">
+                <div class="text-center mt-4 admin-only simulator-hide" style="padding-top: 2rem;">
                     <button onclick="saveRealResults()" class="btn btn-primary" style="background:var(--color-secondary); box-shadow:0 4px 15px rgba(206,17,38,0.3); border-bottom-color: var(--color-secondary-dark);">
                         Pitar Final (Publicar Resultados a Todos)
                     </button>
@@ -776,6 +922,47 @@
         </section>
 
     </main>
+
+    <!-- MODAL DE ESTADÍSTICAS -->
+    <div id="player-modal" class="modal-overlay" onclick="closePlayerModal(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closePlayerModal(event, true)">✖</button>
+                <div class="modal-title" id="modal-name">Participante</div>
+                <div class="modal-subtitle" id="modal-rank">Posición: --</div>
+            </div>
+            <div class="modal-body">
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-value" id="modal-pts">0</div>
+                        <div class="stat-label">Puntos Totales</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="modal-eff">0%</div>
+                        <div class="stat-label">Efectividad</div>
+                    </div>
+                </div>
+                
+                <h4 style="font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Desglose de Aciertos</h4>
+                <div class="stat-bar-container">
+                    <div id="bar-exact" class="stat-bar-exact" style="width: 0%;"></div>
+                    <div id="bar-partial" class="stat-bar-partial" style="width: 0%;"></div>
+                </div>
+                <div class="stat-legend">
+                    <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div> <span id="leg-exact">0 Exactos</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#3b82f6;"></div> <span id="leg-partial">0 Resultados</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#fee2e2;"></div> <span id="leg-miss">0 Fallos</span></div>
+                </div>
+
+                <a href="#" id="btn-share-wa" target="_blank" class="btn-whatsapp">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+                    </svg>
+                    Presumir en WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Tipo Module para habilitar la Nube de Firebase -->
     <script type="module">
@@ -816,7 +1003,6 @@
 
         /* =========================================
            BASE DE DATOS MANUAL DE HORARIOS OFICIALES
-           (Formato ISO con Zona Horaria CST: -06:00)
            ========================================= */
         const officialSchedule = {
             "México-Sudáfrica": "2026-06-11T13:00:00-06:00",
@@ -918,6 +1104,7 @@
         }
 
         /* ESTADO DE LA APLICACIÓN Y BASE DE DATOS EN LA NUBE */
+        let currentMatchCenterTab = 'history';
         let state = { 
             users: JSON.parse(localStorage.getItem('qm_users')) || {}, 
             realResults: JSON.parse(localStorage.getItem('qm_real_results')) || { groups: {} },
@@ -925,7 +1112,10 @@
         };
         let currentUser = "";
         let isAdmin = false; 
-        let currentMatchCenterTab = 'history';
+        
+        // Estado del Simulador
+        let isSimulatorActive = false;
+        let simResults = {}; // Copia temporal de resultados
         
         let app, auth, db, authUser;
 
@@ -978,8 +1168,12 @@
                 }
                 localStorage.setItem('qm_real_results', JSON.stringify(state.realResults));
                 localStorage.setItem('qm_prev_ranks', JSON.stringify(state.previousRanks));
-                updateLeaderboard();
-                if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminGroups();
+                
+                // Si el simulador no está activo, actualizamos la tabla normal
+                if (!isSimulatorActive) {
+                    updateLeaderboard();
+                    if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminGroups();
+                }
             }, (err) => console.error(err));
         }
 
@@ -995,6 +1189,58 @@
         window.deleteUserPrediction = deleteUserPrediction;
         window.toggleMatchCenter = toggleMatchCenter;
         window.toggleJoker = toggleJoker;
+        window.openPlayerModal = openPlayerModal;
+        window.closePlayerModal = closePlayerModal;
+        window.toggleSimulator = toggleSimulator;
+        window.handleSimInput = handleSimInput;
+
+        // --- SISTEMA DE SIMULADOR ---
+        function toggleSimulator() {
+            isSimulatorActive = !isSimulatorActive;
+            const btn = document.getElementById('sim-toggle-btn');
+            
+            if (isSimulatorActive) {
+                document.body.classList.add('simulator-mode');
+                btn.classList.add('active');
+                btn.innerHTML = '🧪 Apagar Simulador';
+                // Clonar resultados reales a la memoria temporal
+                simResults = JSON.parse(JSON.stringify(state.realResults.groups || {}));
+                
+                // Forzar ir a la pestaña Admin para que vean el simulador
+                if(!isAdmin && document.getElementById('view-admin').classList.contains('hidden')){
+                    switchTab('admin');
+                }
+                renderAdminGroups(); // Renderizar inputs como sim-input
+            } else {
+                document.body.classList.remove('simulator-mode');
+                btn.classList.remove('active');
+                btn.innerHTML = '🧪 Activar Modo Simulador';
+                simResults = {};
+                renderAdminGroups(); // Restaurar inputs normales
+            }
+            updateLeaderboard();
+        }
+
+        // Se llama cada vez que el usuario teclea algo en Modo Simulador
+        function handleSimInput(matchId, team, val) {
+            if(!isSimulatorActive) return;
+            
+            if(!simResults[matchId]) simResults[matchId] = {};
+            if(val !== "") {
+                simResults[matchId][team] = parseInt(val);
+            } else {
+                delete simResults[matchId][team];
+            }
+            
+            // Re-calcular la tabla en vivo
+            updateLeaderboard();
+        }
+
+        // Helper para obtener los resultados a usar (Reales o Simulados)
+        function getActiveResults() {
+            return isSimulatorActive ? simResults : (state.realResults.groups || {});
+        }
+
 
         function toggleMatchCenter(tab) {
             currentMatchCenterTab = tab;
@@ -1017,11 +1263,11 @@
 
         function renderMatchCenter() {
             const container = document.getElementById('match-center-content');
+            const activeRes = getActiveResults();
             
-            const playedMatches = matchesGrupos.filter(m => state.realResults.groups && state.realResults.groups[m.id]);
-            const unplayedMatches = matchesGrupos.filter(m => !state.realResults.groups || !state.realResults.groups[m.id]);
+            const playedMatches = matchesGrupos.filter(m => activeRes && activeRes[m.id] && activeRes[m.id].a !== undefined && activeRes[m.id].b !== undefined);
+            const unplayedMatches = matchesGrupos.filter(m => !activeRes || !activeRes[m.id] || activeRes[m.id].a === undefined || activeRes[m.id].b === undefined);
 
-            // Asignación de banderas usando FlagCDN para soportar PC y Móviles
             const getManualFlag = (team) => {
                 const codes = {
                     "México": "mx", "Sudáfrica": "za", "Corea del Sur": "kr", "Chequia": "cz",
@@ -1039,9 +1285,7 @@
                 };
                 const code = codes[team];
                 if (!code) return "";
-                // Removemos el inline-block y vertical-align, ya que flexbox hace el alineamiento.
-                // Añadimos flex-shrink-0 para que la bandera no se aplaste si el nombre del país es largo.
-                return `<img src="https://flagcdn.com/24x18/${code}.png" width="24" height="18" alt="${team}" style="border-radius:2px; box-shadow:0 1px 3px rgba(0,0,0,0.2); flex-shrink:0;">`;
+                return `<img src="https://flagcdn.com/24x18/${code}.png" class="team-flag" alt="${team}">`;
             };
 
             if (currentMatchCenterTab === 'history') {
@@ -1055,7 +1299,7 @@
                 
                 const latestMatch = reversedMatches[0]; 
                 const prevMatches = reversedMatches.slice(1); 
-                const resLatest = state.realResults.groups[latestMatch.id];
+                const resLatest = activeRes[latestMatch.id];
                 
                 let html = `
                     <div class="match-center-layout w-full">
@@ -1073,7 +1317,7 @@
                 if (prevMatches.length > 0) {
                     html += `<div class="history-matches-wrapper">`;
                     html += prevMatches.map(m => {
-                        const res = state.realResults.groups[m.id];
+                        const res = activeRes[m.id];
                         return `
                             <div class="latest-match-card">
                                 <div class="team left" title="${m.teamA}">
@@ -1122,7 +1366,6 @@
             }
         }
 
-        // === LOGICA DEL COMODÍN DE ORO ===
         function toggleJoker(matchId, grupo) {
             if(!isAdmin) return alert("Solo el administrador puede activar los comodines.");
             
@@ -1265,21 +1508,29 @@
 
         async function saveRealResults() {
             if(!isAdmin) return alert("Solo el administrador puede guardar los resultados oficiales.");
-            if (!state.realResults.groups) state.realResults.groups = {};
             
-            // Guardamos las posiciones actuales ANTES de aplicar los nuevos resultados
-            state.previousRanks = getCurrentRankings();
-            
-            matchesGrupos.forEach(m => {
-                const valA = document.getElementById(`real-${m.id}-a`).value;
-                const valB = document.getElementById(`real-${m.id}-b`).value;
-                if(valA !== "" && valB !== "") {
-                    state.realResults.groups[m.id] = { a: parseInt(valA), b: parseInt(valB) };
-                } else if (state.realResults.groups[m.id]) {
-                    delete state.realResults.groups[m.id];
+            // Si estaba en modo simulador, pasamos los datos del simulador al estado real
+            if(isSimulatorActive) {
+                if(confirm("¿Estás seguro de que quieres publicar los resultados del simulador como OFICIALES?")) {
+                    state.realResults.groups = JSON.parse(JSON.stringify(simResults));
+                    toggleSimulator(); // Apagar simulador
+                } else {
+                    return;
                 }
-            });
+            } else {
+                if (!state.realResults.groups) state.realResults.groups = {};
+                matchesGrupos.forEach(m => {
+                    const valA = document.getElementById(`real-${m.id}-a`).value;
+                    const valB = document.getElementById(`real-${m.id}-b`).value;
+                    if(valA !== "" && valB !== "") {
+                        state.realResults.groups[m.id] = { a: parseInt(valA), b: parseInt(valB) };
+                    } else if (state.realResults.groups[m.id]) {
+                        delete state.realResults.groups[m.id];
+                    }
+                });
+            }
 
+            state.previousRanks = getCurrentRankings();
             localStorage.setItem('qm_real_results', JSON.stringify(state.realResults));
             localStorage.setItem('qm_prev_ranks', JSON.stringify(state.previousRanks));
 
@@ -1329,8 +1580,17 @@
            ========================================= */
         function generateMatchHTML(match, context) {
             const prefix = context === 'admin' ? 'real' : 'pred';
-            const disabledAttr = isAdmin ? '' : 'disabled';
+            let disabledAttr = isAdmin ? '' : 'disabled';
+            let simInputClass = '';
+            let onchangeAttr = '';
             
+            // Lógica especial para inputs en modo Simulador
+            if(context === 'admin' && isSimulatorActive) {
+                disabledAttr = ''; // Todos pueden simular
+                simInputClass = 'sim-input';
+                onchangeAttr = `onkeyup="handleSimInput('${match.id}', 'a', document.getElementById('real-${match.id}-a').value); handleSimInput('${match.id}', 'b', document.getElementById('real-${match.id}-b').value)" onchange="handleSimInput('${match.id}', 'a', document.getElementById('real-${match.id}-a').value); handleSimInput('${match.id}', 'b', document.getElementById('real-${match.id}-b').value)"`;
+            }
+
             let jokerHtml = '';
             let feedbackHtml = '';
             if (context === 'user') {
@@ -1345,9 +1605,9 @@
                         ${match.teamA}
                     </div>
                     <div class="score-inputs">
-                        <input type="number" id="${prefix}-${match.id}-a" min="0" class="score-input" ${disabledAttr}>
+                        <input type="number" id="${prefix}-${match.id}-a" min="0" class="score-input ${simInputClass}" ${disabledAttr} ${onchangeAttr}>
                         <span class="vs-badge">vs</span>
-                        <input type="number" id="${prefix}-${match.id}-b" min="0" class="score-input" ${disabledAttr}>
+                        <input type="number" id="${prefix}-${match.id}-b" min="0" class="score-input ${simInputClass}" ${disabledAttr} ${onchangeAttr}>
                     </div>
                     <div class="team-name" style="display:flex; justify-content:space-between; align-items:center; min-width:0;">
                         <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">
@@ -1376,10 +1636,13 @@
 
         function renderAdminGroups() {
             renderGroups('admin-grupos', 'admin');
+            
+            const activeRes = getActiveResults();
+            
             matchesGrupos.forEach(m => {
-                if(state.realResults.groups && state.realResults.groups[m.id]) {
-                    document.getElementById(`real-${m.id}-a`).value = state.realResults.groups[m.id].a;
-                    document.getElementById(`real-${m.id}-b`).value = state.realResults.groups[m.id].b;
+                if(activeRes && activeRes[m.id]) {
+                    document.getElementById(`real-${m.id}-a`).value = activeRes[m.id].a !== undefined ? activeRes[m.id].a : '';
+                    document.getElementById(`real-${m.id}-b`).value = activeRes[m.id].b !== undefined ? activeRes[m.id].b : '';
                 }
             });
         }
@@ -1413,9 +1676,11 @@
             else document.getElementById('btn-delete-user').classList.add('hidden');
 
             const uData = state.users[currentUser];
+            const activeRes = getActiveResults();
+
             matchesGrupos.forEach(m => {
                 const pred = uData.groups[m.id];
-                const real = state.realResults.groups ? state.realResults.groups[m.id] : null;
+                const real = activeRes ? activeRes[m.id] : null;
                 const feedbackEl = document.getElementById(`feedback-${m.id}`);
 
                 if(pred) {
@@ -1433,40 +1698,23 @@
                     if (btn) btn.classList.remove('active-joker');
                 }
 
-                // Generar retroalimentación visual si el partido ya se jugó
                 if (feedbackEl) {
-                    if (real && pred !== undefined && pred.a !== undefined && pred.b !== undefined && !isNaN(pred.a) && !isNaN(pred.b)) {
-                        const pts = calcMatchPoints(pred, real);
-                        let icon = '❌';
-                        let text = 'Falló';
-                        let cls = 'feedback-miss';
+                    if (real && real.a !== undefined && real.b !== undefined) {
+                        if (pred && pred.a !== undefined && pred.b !== undefined && !isNaN(pred.a) && !isNaN(pred.b)) {
+                            const pts = calcMatchPoints(pred, real);
+                            let cls = 'badge-miss';
+                            let text = '❌ Falló (0 pts)';
+                            
+                            if (pts === 4 || pts === 8) { cls = 'badge-exact'; text = `🎯 Marcador Exacto (+${pts} pts)`; }
+                            else if (pts === 2 || pts === 4) { cls = 'badge-result'; text = `✔️ Acertó Resultado (+${pts} pts)`; }
+                            else if (pts === -1) { cls = 'badge-miss'; text = '❌ Comodín Fallido (-1 pts)'; }
 
-                        if (pts === 4 || pts === 8) {
-                            icon = '🎯'; text = 'Marcador Exacto'; cls = 'feedback-exact';
-                        } else if (pts === 2 || pts === 4) {
-                            icon = '✔️'; text = 'Acertó Resultado'; cls = 'feedback-partial';
-                        } else if (pts === -1) {
-                            icon = '❌'; text = 'Comodín Fallido'; cls = 'feedback-miss';
+                            feedbackEl.innerHTML = `<span class="real-score-label">Marcador Oficial: ${real.a} - ${real.b}</span><div class="badge ${cls}">${text}</div>`;
+                        } else {
+                            feedbackEl.innerHTML = `<span class="real-score-label">Marcador Oficial: ${real.a} - ${real.b}</span><div class="badge badge-miss">❌ No participó (0 pts)</div>`;
                         }
-
-                        feedbackEl.innerHTML = `
-                            <span style="color: var(--text-muted)">Marcador Real: <b style="color:var(--text-main)">${real.a} - ${real.b}</b></span>
-                            <div class="feedback-badge ${cls}">
-                                <span style="font-size:1.1rem">${icon}</span> ${text} <span style="opacity:0.8; font-weight:900;">(${pts > 0 ? '+'+pts : pts} pts)</span>
-                            </div>
-                        `;
-                        feedbackEl.classList.remove('hidden');
-                    } else if (real) {
-                        // Caso donde el partido se jugó pero el participante no lo pronosticó
-                        feedbackEl.innerHTML = `
-                            <span style="color: var(--text-muted)">Marcador Real: <b style="color:var(--text-main)">${real.a} - ${real.b}</b></span>
-                            <div class="feedback-badge feedback-miss">
-                                <span style="font-size:1.1rem">❌</span> Sin pronóstico <span style="opacity:0.8; font-weight:900;">(0 pts)</span>
-                            </div>
-                        `;
                         feedbackEl.classList.remove('hidden');
                     } else {
-                        // Partido no jugado aún
                         feedbackEl.innerHTML = '';
                         feedbackEl.classList.add('hidden');
                     }
@@ -1482,54 +1730,81 @@
         function calcMatchPoints(pred, real) {
             if (!real || pred.a === undefined || pred.b === undefined || isNaN(pred.a) || isNaN(pred.b)) return 0;
             const pA = pred.a, pB = pred.b, rA = real.a, rB = real.b;
-            
             const multiplier = pred.joker ? 2 : 1;
 
-            // Marcador exacto
-            if (pA === rA && pB === rB) {
-                const pts = 4 * multiplier;
-                console.debug('calcMatchPoints: exact', { pred, real, pts });
-                return pts;
-            }
-
-            // Acierto de resultado (ganador/empate)
-            if ((pA > pB && rA > rB) || (pA < pB && rA < rB) || (pA === pB && rA === rB)) {
-                const pts = 2 * multiplier;
-                console.debug('calcMatchPoints: result', { pred, real, pts });
-                return pts;
-            }
-
-            // Si usó comodín y falló (ni exacto ni resultado), penalizar -1
-            if (pred.joker) {
-                console.debug('calcMatchPoints: joker-fail', { pred, real, pts: -1 });
-                return -1;
-            }
-
-            console.debug('calcMatchPoints: miss', { pred, real, pts: 0 });
+            if (pA === rA && pB === rB) return 4 * multiplier;
+            if ((pA > pB && rA > rB) || (pA < pB && rA < rB) || (pA === pB && rA === rB)) return 2 * multiplier;
+            if (pred.joker) return -1;
             return 0;
         }
 
         function calculateStandings() {
             let scores = [];
+            const activeRes = getActiveResults();
+
             for (let name in state.users) {
                 let pts = 0;
                 let exactos = 0;
+                let parciales = 0;
+                let fallos = 0;
+                let rachaExactos = 0; // Para el icono de 🔥
+                let rachaMaxima = 0;
+                
                 const uData = state.users[name];
                 
-                if (uData.groups && state.realResults.groups) {
-                    for (let mId in uData.groups) {
-                        const pred = uData.groups[mId];
-                        const real = state.realResults.groups[mId];
-                        
-                        pts += calcMatchPoints(pred, real);
-                        
-                        if (pred.a !== undefined && pred.b !== undefined && real && real.a !== undefined && real.b !== undefined) {
-                            if (pred.a === real.a && pred.b === real.b) exactos++;
+                if (uData.groups && activeRes) {
+                    // Ordenamos partidos por fecha para calcular la racha cronológicamente
+                    const sortedMatches = matchesGrupos.slice().sort((a,b) => new Date(a.dateIso) - new Date(b.dateIso));
+                    
+                    for (let m of sortedMatches) {
+                        const mId = m.id;
+                        if(activeRes[mId] && activeRes[mId].a !== undefined) {
+                            const pred = uData.groups[mId] || {};
+                            const real = activeRes[mId];
+                            
+                            const matchPts = calcMatchPoints(pred, real);
+                            pts += matchPts;
+                            
+                            if (matchPts === 4 || matchPts === 8) {
+                                exactos++;
+                                rachaExactos++;
+                                if(rachaExactos > rachaMaxima) rachaMaxima = rachaExactos;
+                            } else if (matchPts === 2 || matchPts === 4) {
+                                parciales++;
+                                rachaExactos = 0; // Corta la racha de exactos
+                            } else {
+                                fallos++;
+                                rachaExactos = 0; // Corta la racha
+                            }
                         }
                     }
                 }
-                scores.push({ name, pts, exactos });
+                
+                // Lógica del Francotirador (El único que le atinó a un marcador exacto en todo el torneo)
+                // Se evalúa después en un segundo pase
+                scores.push({ name, pts, exactos, parciales, fallos, rachaActual: rachaMaxima, isSniper: false });
             }
+            
+            // Calcular francotirador 🎯 (Si en algun partido hubo un solo ganador exacto, él recibe el badge)
+            if(activeRes) {
+                matchesGrupos.forEach(m => {
+                    const mId = m.id;
+                    if(activeRes[mId] && activeRes[mId].a !== undefined) {
+                        let aciertosExactos = [];
+                        for(let name in state.users) {
+                            const p = state.users[name].groups ? state.users[name].groups[mId] : null;
+                            if(p && p.a === activeRes[mId].a && p.b === activeRes[mId].b) {
+                                aciertosExactos.push(name);
+                            }
+                        }
+                        if(aciertosExactos.length === 1) { // ¡Solo un participante le atinó!
+                            const userObj = scores.find(s => s.name === aciertosExactos[0]);
+                            if(userObj) userObj.isSniper = true;
+                        }
+                    }
+                });
+            }
+
             scores.sort((a, b) => b.pts - a.pts || b.exactos - a.exactos);
             return scores;
         }
@@ -1551,12 +1826,12 @@
 
         function updateDashboardStats() {
             const totalMatches = matchesGrupos.length;
-            const playedKeys = Object.keys(state.realResults.groups || {});
-            const playedCount = playedKeys.length;
+            const activeRes = getActiveResults();
+            const playedCount = Object.keys(activeRes).filter(k => activeRes[k].a !== undefined).length;
             
             const progressPct = (playedCount / totalMatches) * 100;
             document.getElementById('tournament-progress').style.width = `${progressPct}%`;
-            document.getElementById('tournament-progress-text').innerText = `${playedCount} / ${totalMatches} Partidos`;
+            document.getElementById('tournament-progress-text').innerText = `${playedCount} / ${totalMatches} Jugados`;
 
             renderMatchCenter();
         }
@@ -1573,14 +1848,17 @@
                 return;
             }
 
-            // Iconos SVG Profesionales
             const svgUp = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>`;
             const svgDown = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>`;
             const svgFlat = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`;
 
             tbody.innerHTML = scores.map((s, i) => {
                 const currentRank = i + 1;
-                const previousRank = state.previousRanks ? state.previousRanks[s.name] : null;
+                // Si el simulador esta activo, comparamos contra la posicion real (index)
+                // Si no, comparamos contra la foto guardada en la base de datos
+                const previousRank = isSimulatorActive ? 
+                                    (Object.keys(state.previousRanks).length > 0 ? state.previousRanks[s.name] : currentRank) : 
+                                    (state.previousRanks ? state.previousRanks[s.name] : null);
                 
                 let trendIcon = svgFlat;
                 let trendClass = 'trend-flat';
@@ -1588,18 +1866,18 @@
                 
                 if (previousRank) {
                     if (currentRank < previousRank) {
-                        trendIcon = svgUp;
-                        trendClass = 'trend-up';
-                        trendTitle = `Subió desde la posición ${previousRank}`;
+                        trendIcon = svgUp; trendClass = 'trend-up'; trendTitle = `Subió desde la posición ${previousRank}`;
                     } else if (currentRank > previousRank) {
-                        trendIcon = svgDown;
-                        trendClass = 'trend-down';
-                        trendTitle = `Bajó desde la posición ${previousRank}`;
+                        trendIcon = svgDown; trendClass = 'trend-down'; trendTitle = `Bajó desde la posición ${previousRank}`;
                     }
                 }
 
                 const medal = i === 0 ? '🏆' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="color:#9ca3af; font-weight:800;">${currentRank}</span>`;
                 
+                let badges = "";
+                if(s.rachaActual >= 2) badges += `<span class="streak-fire" title="¡En Racha! ${s.rachaActual} marcadores exactos seguidos">🔥</span>`;
+                if(s.isSniper) badges += `<span class="streak-sniper" title="Francotirador: Único en atinarle al marcador de un partido">🎯</span>`;
+
                 return `
                 <tr>
                     <td>
@@ -1608,13 +1886,53 @@
                             <span class="${trendClass}" title="${trendTitle}" style="display:inline-flex; align-items:center; justify-content:center;">${trendIcon}</span>
                         </div>
                     </td>
-                    <td>${s.name}</td>
+                    <td onclick="openPlayerModal('${s.name}', ${currentRank})" title="Ver Estadísticas">${s.name} ${badges}</td>
                     <td>
                         ${s.exactos > 0 ? `<span class="exact-badge">🎯 ${s.exactos}</span>` : `<span style="color:#d1d5db;">-</span>`}
                     </td>
                     <td class="pts-total">${s.pts}</td>
                 </tr>`;
             }).join('');
+        }
+
+        // ==========================================
+        // MODAL DE ESTADÍSTICAS DEL JUGADOR
+        // ==========================================
+        function openPlayerModal(playerName, rank) {
+            const scores = calculateStandings();
+            const playerStats = scores.find(s => s.name === playerName);
+            if(!playerStats) return;
+
+            document.getElementById('modal-name').innerText = playerName;
+            document.getElementById('modal-rank').innerText = `Posición: ${rank}`;
+            document.getElementById('modal-pts').innerText = playerStats.pts;
+            
+            const totalJugados = playerStats.exactos + playerStats.parciales + playerStats.fallos;
+            const efectividad = totalJugados > 0 ? Math.round(((playerStats.exactos + playerStats.parciales) / totalJugados) * 100) : 0;
+            document.getElementById('modal-eff').innerText = `${efectividad}%`;
+
+            const pctExact = totalJugados > 0 ? (playerStats.exactos / totalJugados) * 100 : 0;
+            const pctPartial = totalJugados > 0 ? (playerStats.parciales / totalJugados) * 100 : 0;
+            
+            document.getElementById('bar-exact').style.width = `${pctExact}%`;
+            document.getElementById('bar-partial').style.width = `${pctPartial}%`;
+            
+            document.getElementById('leg-exact').innerText = `${playerStats.exactos} Exactos`;
+            document.getElementById('leg-partial').innerText = `${playerStats.parciales} Resultados`;
+            document.getElementById('leg-miss').innerText = `${playerStats.fallos} Fallos`;
+
+            // Configurar WhatsApp
+            const medal = rank === 1 ? '🏆' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '⚽';
+            let waText = `¡Voy en la Posición #${rank} ${medal} en la Quiniela Master 2026 con ${playerStats.pts} puntos!\n\nLlevo ${playerStats.exactos} marcadores exactos 🎯 y una efectividad del ${efectividad}% 🔥.\n\n¿Quién me alcanza? 👀`;
+            document.getElementById('btn-share-wa').href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+            document.getElementById('player-modal').classList.add('active');
+        }
+
+        function closePlayerModal(e, force = false) {
+            if (force || e.target.classList.contains('modal-overlay')) {
+                document.getElementById('player-modal').classList.remove('active');
+            }
         }
 
         function updateCountdown() {
@@ -1641,9 +1959,8 @@
             document.getElementById('cd-secs').innerText = seconds.toString().padStart(2, '0');
         }
 
-        setInterval(updateCountdown, 1000); // Actualizar cada segundo
-        updateCountdown(); // Llamada inicial
-
+        setInterval(updateCountdown, 1000); 
+        updateCountdown(); 
         switchTab('leaderboard');
     </script>
 </body>
