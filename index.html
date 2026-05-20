@@ -1607,12 +1607,12 @@
                     if (pred && pred.a !== undefined && pred.b !== undefined) {
                         const isJoker = pred.joker || false;
                         let matchPts = 0;
-                        let hitExact = false;
+                        let hitSomething = false;
                         
                         if (pred.a === real.a && pred.b === real.b) {
                             matchPts = isJoker ? 8 : 4;
                             exactos++;
-                            hitExact = true;
+                            hitSomething = true;
                         } else if (
                             (pred.a > pred.b && real.a > real.b) || 
                             (pred.a < pred.b && real.a < real.b) || 
@@ -1620,13 +1620,14 @@
                         ) {
                             matchPts = isJoker ? 4 : 2;
                             parciales++;
+                            hitSomething = true;
                         } else {
                             if(isJoker) matchPts = -1;
                             fallos++;
                         }
                         pts += matchPts;
                         
-                        if (hitExact) {
+                        if (hitSomething) {
                             rachaActual++;
                             if (rachaActual > rachaMaxima) rachaMaxima = rachaActual;
                         } else {
@@ -1809,7 +1810,7 @@
 
                 const medal = i === 0 ? '🏆' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="color:#9ca3af; font-weight:800;">${currentRank}</span>`;
                 let badges = "";
-                if(s.rachaActual >= 2) badges += `<span class="streak-fire" title="¡En Racha! ${s.rachaActual} marcadores exactos seguidos">🔥 x${s.rachaActual}</span>`;
+                if(s.rachaActual >= 2) badges += `<span class="streak-fire" title="¡En Racha! ${s.rachaActual} aciertos seguidos">🔥 x${s.rachaActual}</span>`;
 
                 return `
                 <tr>
