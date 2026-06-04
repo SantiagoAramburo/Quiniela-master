@@ -2000,11 +2000,20 @@
             const now = new Date().getTime();
             const diff = kickoff - now;
 
-            const container = document.getElementById('countdown-container');
-            if (!container) return;
+            const cdDays = document.getElementById('cd-days');
+            const cdHours = document.getElementById('cd-hours');
+            const cdMins = document.getElementById('cd-mins');
+            const cdSecs = document.getElementById('cd-secs');
+
+            if (!cdDays || !cdHours || !cdMins || !cdSecs) return;
 
             if (diff <= 0) {
-                container.innerHTML = '<div class="countdown-title" style="margin:0; font-size:1rem; color:var(--color-secondary);">¡EL MUNDIAL ESTÁ EN JUEGO! ⚽🏆</div>';
+                cdDays.innerText = '00';
+                cdHours.innerText = '00';
+                cdMins.innerText = '00';
+                cdSecs.innerText = '00';
+                const countdownTitle = document.querySelector('.countdown-title');
+                if (countdownTitle) countdownTitle.innerText = '¡EL MUNDIAL ESTÁ EN JUEGO! ⚽🏆';
                 return;
             }
 
@@ -2013,15 +2022,10 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            const cdDays = document.getElementById('cd-days');
-            const cdHours = document.getElementById('cd-hours');
-            const cdMins = document.getElementById('cd-mins');
-            const cdSecs = document.getElementById('cd-secs');
-
-            if (cdDays) cdDays.innerText = days.toString().padStart(2, '0');
-            if (cdHours) cdHours.innerText = hours.toString().padStart(2, '0');
-            if (cdMins) cdMins.innerText = minutes.toString().padStart(2, '0');
-            if (cdSecs) cdSecs.innerText = seconds.toString().padStart(2, '0');
+            cdDays.innerText = days.toString().padStart(2, '0');
+            cdHours.innerText = hours.toString().padStart(2, '0');
+            cdMins.innerText = minutes.toString().padStart(2, '0');
+            cdSecs.innerText = seconds.toString().padStart(2, '0');
         }
 
         setInterval(updateCountdown, 1000); 
