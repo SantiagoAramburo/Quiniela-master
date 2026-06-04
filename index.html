@@ -1998,8 +1998,8 @@
         let countdownInitialized = false;
 
         function updateCountdown() {
-            // 11 de junio 2026 a las 13:00 CDMX (UTC-5 en junio/CDT)
-            const kickoff = new Date('2026-06-11T13:00:00-05:00').getTime();
+            // 11 de junio 2026 a las 13:00 CDMX (UTC-6 todo el año)
+            const kickoff = new Date('2026-06-11T13:00:00-06:00').getTime();
             const now = new Date().getTime();
             const diff = kickoff - now;
 
