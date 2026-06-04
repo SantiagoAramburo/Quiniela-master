@@ -1171,14 +1171,19 @@
                     
                     let matchDateStr = officialSchedule[keyNormal] || officialSchedule[keyInvertida];
                     if(!matchDateStr) matchDateStr = "2026-06-11T12:00:00-06:00"; 
+                    
+                    const isVisualInverted = (idCount === 3 || idCount === 5);
 
                     matchesGrupos.push({ 
-                        id: `G${grupo}-${idCount++}`, 
+                        id: `G${grupo}-${idCount}`, 
                         grupo: grupo, 
                         teamA: teamA, 
                         teamB: teamB,
-                        dateIso: new Date(matchDateStr).toISOString() 
+                        dateIso: new Date(matchDateStr).toISOString(),
+                        visualInvert: isVisualInverted 
                     });
+                    
+                    idCount++;
                 }
             }
         }
@@ -1347,52 +1352,41 @@
         function renderMatchCenter() {
             const container = document.getElementById('match-center-content');
             const activeRes = getActiveResults();
-            
             const playedMatches = matchesGrupos.filter(m => activeRes && activeRes[m.id] && activeRes[m.id].a !== undefined && activeRes[m.id].b !== undefined);
             const unplayedMatches = matchesGrupos.filter(m => !activeRes || !activeRes[m.id] || activeRes[m.id].a === undefined || activeRes[m.id].b === undefined);
 
             const getManualFlag = (team) => {
-                const codes = {
-                    "México": "mx", "Sudáfrica": "za", "Corea del Sur": "kr", "Chequia": "cz",
-                    "Canadá": "ca", "Bosnia y H.": "ba", "Qatar": "qa", "Suiza": "ch",
-                    "Brasil": "br", "Marruecos": "ma", "Haití": "ht", "Escocia": "gb-sct",
-                    "Estados Unidos": "us", "Paraguay": "py", "Australia": "au", "Turquía": "tr",
-                    "Alemania": "de", "Curazao": "cw", "Costa de Marfil": "ci", "Ecuador": "ec",
-                    "Países Bajos": "nl", "Japón": "jp", "Suecia": "se", "Túnez": "tn",
-                    "Bélgica": "be", "Egipto": "eg", "Irán": "ir", "Nueva Zelanda": "nz",
-                    "España": "es", "Cabo Verde": "cv", "Arabia Saudita": "sa", "Uruguay": "uy",
-                    "Francia": "fr", "Senegal": "sn", "Irak": "iq", "Noruega": "no",
-                    "Argentina": "ar", "Argelia": "dz", "Austria": "at", "Jordania": "jo",
-                    "Portugal": "pt", "RD Congo": "cd", "Uzbekistán": "uz", "Colombia": "co",
-                    "Inglaterra": "gb-eng", "Croacia": "hr", "Ghana": "gh", "Panamá": "pa"
-                };
+                const codes = { "México": "mx", "Sudáfrica": "za", "Corea del Sur": "kr", "Chequia": "cz", "Canadá": "ca", "Bosnia y H.": "ba", "Qatar": "qa", "Suiza": "ch", "Brasil": "br", "Marruecos": "ma", "Haití": "ht", "Escocia": "gb-sct", "Estados Unidos": "us", "Paraguay": "py", "Australia": "au", "Turquía": "tr", "Alemania": "de", "Curazao": "cw", "Costa de Marfil": "ci", "Ecuador": "ec", "Países Bajos": "nl", "Japón": "jp", "Suecia": "se", "Túnez": "tn", "Bélgica": "be", "Egipto": "eg", "Irán": "ir", "Nueva Zelanda": "nz", "España": "es", "Cabo Verde": "cv", "Arabia Saudita": "sa", "Uruguay": "uy", "Francia": "fr", "Senegal": "sn", "Irak": "iq", "Noruega": "no", "Argentina": "ar", "Argelia": "dz", "Austria": "at", "Jordania": "jo", "Portugal": "pt", "RD Congo": "cd", "Uzbekistán": "uz", "Colombia": "co", "Inglaterra": "gb-eng", "Croacia": "hr", "Ghana": "gh", "Panamá": "pa" };
                 const code = codes[team];
                 if (!code) return "";
                 return `<img src="https://flagcdn.com/24x18/${code}.png" class="team-flag" alt="${team}">`;
             };
 
             if (currentMatchCenterTab === 'history') {
-                if (playedMatches.length === 0) {
-                    container.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 1rem;">Esperando el silbatazo inicial del Mundial... ⚽</div>`;
-                    return;
-                }
+                if (playedMatches.length === 0) { container.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 1rem;">Esperando el silbatazo inicial del Mundial... ⚽</div>`; return; }
 
-                playedMatches.sort((a, b) => new Date(a.dateIso) - new Date(b.dateIso));
+                playedMatches.sort(sortMatchesCustom);
                 const reversedMatches = playedMatches.slice().reverse();
                 
                 const latestMatch = reversedMatches[0]; 
                 const prevMatches = reversedMatches.slice(1); 
                 const resLatest = activeRes[latestMatch.id];
                 
+                // Mapear Visualmente la última partida
+                const displayLatestA = latestMatch.visualInvert ? latestMatch.teamB : latestMatch.teamA;
+                const displayLatestB = latestMatch.visualInvert ? latestMatch.teamA : latestMatch.teamB;
+                const scoreLatestA = latestMatch.visualInvert ? resLatest.b : resLatest.a;
+                const scoreLatestB = latestMatch.visualInvert ? resLatest.a : resLatest.b;
+
                 let html = `
                     <div class="match-center-layout w-full">
                         <div class="hero-match">
-                            <div class="team left" title="${latestMatch.teamA}">
-                                ${getManualFlag(latestMatch.teamA)} <span>${latestMatch.teamA}</span>
+                            <div class="team left" title="${displayLatestA}">
+                                ${getManualFlag(displayLatestA)} <span>${displayLatestA}</span>
                             </div>
-                            <div class="score-badge">${resLatest.a} - ${resLatest.b}</div>
-                            <div class="team right" title="${latestMatch.teamB}">
-                                <span>${latestMatch.teamB}</span> ${getManualFlag(latestMatch.teamB)}
+                            <div class="score-badge">${scoreLatestA} - ${scoreLatestB}</div>
+                            <div class="team right" title="${displayLatestB}">
+                                <span>${displayLatestB}</span> ${getManualFlag(displayLatestB)}
                             </div>
                         </div>
                 `;
@@ -1401,14 +1395,19 @@
                     html += `<div class="history-matches-wrapper">`;
                     html += prevMatches.map(m => {
                         const res = activeRes[m.id];
+                        const dispA = m.visualInvert ? m.teamB : m.teamA;
+                        const dispB = m.visualInvert ? m.teamA : m.teamB;
+                        const sA = m.visualInvert ? res.b : res.a;
+                        const sB = m.visualInvert ? res.a : res.b;
+
                         return `
                             <div class="latest-match-card">
-                                <div class="team left" title="${m.teamA}">
-                                    ${getManualFlag(m.teamA)} <span>${m.teamA}</span>
+                                <div class="team left" title="${dispA}">
+                                    ${getManualFlag(dispA)} <span>${dispA}</span>
                                 </div>
-                                <div class="score-badge">${res.a} - ${res.b}</div>
-                                <div class="team right" title="${m.teamB}">
-                                    <span>${m.teamB}</span> ${getManualFlag(m.teamB)}
+                                <div class="score-badge">${sA} - ${sB}</div>
+                                <div class="team right" title="${dispB}">
+                                    <span>${dispB}</span> ${getManualFlag(dispB)}
                                 </div>
                             </div>
                         `;
@@ -1419,16 +1418,15 @@
                 container.innerHTML = html;
                 
             } else {
-                if (unplayedMatches.length === 0) {
-                    container.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 1rem;">¡Se han jugado todos los partidos de la Fase de Grupos! 🎉</div>`;
-                    return;
-                }
+                if (unplayedMatches.length === 0) { container.innerHTML = `<div style="width:100%; text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 1rem;">¡Se han jugado todos los partidos de la Fase de Grupos! 🎉</div>`; return; }
 
-                unplayedMatches.sort((a, b) => new Date(a.dateIso) - new Date(b.dateIso));
+                unplayedMatches.sort(sortMatchesCustom);
                 
                 let html = `<div class="history-matches-wrapper w-full">`; 
                 html += unplayedMatches.map(m => {
                     const localTimeStr = formatDateToLocal(m.dateIso);
+                    const dispA = m.visualInvert ? m.teamB : m.teamA;
+                    const dispB = m.visualInvert ? m.teamA : m.teamB;
                     return `
                         <div class="upcoming-match-card">
                             <div class="um-header">
@@ -1436,13 +1434,17 @@
                                 <span class="um-date">🗓️ ${localTimeStr}</span>
                             </div>
                             <div class="um-teams">
-                                <span class="team left" title="${m.teamA}">${m.teamA}</span>
+                                <span class="team left" title="${dispA}">${dispA}</span>
                                 <span class="um-vs">VS</span>
-                                <span class="team right" title="${m.teamB}">${m.teamB}</span>
+                                <span class="team right" title="${dispB}">${dispB}</span>
                             </div>
                         </div>
                     `;
                 }).join('');
+                html += `</div>`;
+                container.innerHTML = html;
+            }
+        }
                 html += `</div>`;
                 container.innerHTML = html;
             }
@@ -1569,20 +1571,30 @@
                     const isDisabled = isPlayed || !isAdmin;
                     const disAttr = isDisabled ? 'disabled' : '';
                     const jokerClass = pred.joker ? 'active-joker' : '';
-                    
                     const timeText = new Date(m.dateIso).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+                    // APLICANDO EL ESPEJO VISUAL PARA INPUTS DE USUARIO
+                    const displayTeamA = m.visualInvert ? m.teamB : m.teamA;
+                    const displayTeamB = m.visualInvert ? m.teamA : m.teamB;
+                    const inputIdA = m.visualInvert ? `pred-${m.id}-b` : `pred-${m.id}-a`;
+                    const inputIdB = m.visualInvert ? `pred-${m.id}-a` : `pred-${m.id}-b`;
+                    const valDisplayA = m.visualInvert ? pred.b : pred.a;
+                    const valDisplayB = m.visualInvert ? pred.a : pred.b;
 
                     let feedbackHTML = '';
                     if (isPlayed) {
+                        const realDisplayA = m.visualInvert ? real.b : real.a;
+                        const realDisplayB = m.visualInvert ? real.a : real.b;
+
                         if (pred.a === '' || pred.b === '') {
-                             feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-miss">❌ No participó (0 pts)</div></div>`;
+                             feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${realDisplayA} - ${realDisplayB}</span><div class="badge badge-miss">❌ No participó (0 pts)</div></div>`;
                         } else {
                             if (pred.a === real.a && pred.b === real.b) {
-                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-exact">🎯 Exacto (+${pred.joker ? '8' : '4'} pts)</div></div>`;
+                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${realDisplayA} - ${realDisplayB}</span><div class="badge badge-exact">🎯 Exacto (+${pred.joker ? '8' : '4'} pts)</div></div>`;
                             } else if ((pred.a > pred.b && real.a > real.b) || (pred.a < pred.b && real.a < real.b) || (pred.a === pred.b && real.a === real.b)) {
-                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-result">✔️ Resultado (+${pred.joker ? '4' : '2'} pts)</div></div>`;
+                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${realDisplayA} - ${realDisplayB}</span><div class="badge badge-result">✔️ Resultado (+${pred.joker ? '4' : '2'} pts)</div></div>`;
                             } else {
-                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${real.a} - ${real.b}</span><div class="badge badge-miss">${pred.joker ? '❌ Comodín Fallido (-1 pts)' : '❌ Falló (0 pts)'}</div></div>`;
+                                feedbackHTML = `<div class="match-feedback"><span class="real-score-label">Marcador: ${realDisplayA} - ${realDisplayB}</span><div class="badge badge-miss">${pred.joker ? '❌ Comodín Fallido (-1 pts)' : '❌ Falló (0 pts)'}</div></div>`;
                             }
                         }
                     }
@@ -1594,13 +1606,13 @@
                             <span>⌚ ${timeText}</span>
                         </div>
                         <div class="match-row-main">
-                            <div class="team-name right">${m.teamA}</div>
+                            <div class="team-name right">${displayTeamA}</div>
                             <div class="score-inputs">
-                                <input type="number" id="pred-${m.id}-a" class="score-input" value="${pred.a}" min="0" ${disAttr}>
+                                <input type="number" id="${inputIdA}" class="score-input" value="${valDisplayA !== undefined ? valDisplayA : ''}" min="0" ${disAttr}>
                                 <span class="vs-badge">VS</span>
-                                <input type="number" id="pred-${m.id}-b" class="score-input" value="${pred.b}" min="0" ${disAttr}>
+                                <input type="number" id="${inputIdB}" class="score-input" value="${valDisplayB !== undefined ? valDisplayB : ''}" min="0" ${disAttr}>
                             </div>
-                            <div class="team-name">${m.teamB}</div>
+                            <div class="team-name">${displayTeamB}</div>
                             <button id="joker-btn-${m.id}" class="joker-btn joker-group-${m.grupo} ${jokerClass}" onclick="toggleJoker('${m.id}', '${m.grupo}')" ${disAttr} title="Usar Comodín (1 por Grupo)">★</button>
                         </div>
                         ${feedbackHTML}
@@ -1614,7 +1626,6 @@
         function renderAdminGroups() {
             const container = document.getElementById('admin-grupos');
             let html = '';
-            
             const activeRes = getActiveResults();
             const inputClass = isSimulatorActive ? 'score-input sim-input' : 'score-input';
             const datesMap = getMatchesByDateMap();
@@ -1625,10 +1636,18 @@
                 dateMatches.forEach(m => {
                     const real = activeRes[m.id] || { a: '', b: '' };
                     const disAttr = (!isAdmin && !isSimulatorActive) ? 'disabled' : '';
-                    const simOnKeyUpA = isSimulatorActive ? `onkeyup="handleSimInput('${m.id}', 'a', this.value)" onchange="handleSimInput('${m.id}', 'a', this.value)"` : '';
-                    const simOnKeyUpB = isSimulatorActive ? `onkeyup="handleSimInput('${m.id}', 'b', this.value)" onchange="handleSimInput('${m.id}', 'b', this.value)"` : '';
-                    
                     const timeText = new Date(m.dateIso).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+                    // APLICANDO EL ESPEJO VISUAL PARA INPUTS DEL ADMIN
+                    const displayTeamA = m.visualInvert ? m.teamB : m.teamA;
+                    const displayTeamB = m.visualInvert ? m.teamA : m.teamB;
+                    const inputIdA = m.visualInvert ? `real-${m.id}-b` : `real-${m.id}-a`;
+                    const inputIdB = m.visualInvert ? `real-${m.id}-a` : `real-${m.id}-b`;
+                    const valDisplayA = m.visualInvert ? real.b : real.a;
+                    const valDisplayB = m.visualInvert ? real.a : real.b;
+
+                    const simOnKeyUpA = isSimulatorActive ? `onkeyup="handleSimInput('${m.id}', '${m.visualInvert ? 'b' : 'a'}', this.value)" onchange="handleSimInput('${m.id}', '${m.visualInvert ? 'b' : 'a'}', this.value)"` : '';
+                    const simOnKeyUpB = isSimulatorActive ? `onkeyup="handleSimInput('${m.id}', '${m.visualInvert ? 'a' : 'b'}', this.value)" onchange="handleSimInput('${m.id}', '${m.visualInvert ? 'a' : 'b'}', this.value)"` : '';
 
                     html += `
                     <div class="match-row">
@@ -1637,12 +1656,20 @@
                             <span>⌚ ${timeText}</span>
                         </div>
                         <div class="match-row-main">
-                            <div class="team-name right">${m.teamA}</div>
+                            <div class="team-name right">${displayTeamA}</div>
                             <div class="score-inputs">
-                                <input type="number" id="real-${m.id}-a" class="${inputClass}" value="${real.a}" min="0" ${disAttr} ${simOnKeyUpA}>
+                                <input type="number" id="${inputIdA}" class="${inputClass}" value="${valDisplayA !== undefined ? valDisplayA : ''}" min="0" ${disAttr} ${simOnKeyUpA}>
                                 <span class="vs-badge">VS</span>
-                                <input type="number" id="real-${m.id}-b" class="${inputClass}" value="${real.b}" min="0" ${disAttr} ${simOnKeyUpB}>
+                                <input type="number" id="${inputIdB}" class="${inputClass}" value="${valDisplayB !== undefined ? valDisplayB : ''}" min="0" ${disAttr} ${simOnKeyUpB}>
                             </div>
+                            <div class="team-name">${displayTeamB}</div>
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
+        }
                             <div class="team-name">${m.teamB}</div>
                         </div>
                     </div>`;
