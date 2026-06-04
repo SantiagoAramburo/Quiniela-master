@@ -1447,8 +1447,6 @@
         }
                 html += `</div>`;
                 container.innerHTML = html;
-            }
-        }
 
         function toggleJoker(matchId, grupo) {
             if(!isAdmin) return alert("Solo el administrador puede activar los comodines.");
@@ -1534,7 +1532,7 @@
         // FUNCIONES DE AGRUPAMIENTO POR FECHA
         // ==========================================
         function getMatchesByDateMap() {
-            const sortedMatches = [...matchesGrupos].sort((a,b) => new Date(a.dateIso) - new Date(b.dateIso));
+            const sortedMatches = [...matchesGrupos].sort(sortMatchesCustom);
             const datesMap = new Map();
             
             sortedMatches.forEach(m => {
