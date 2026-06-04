@@ -1305,6 +1305,26 @@
             return isSimulatorActive ? simResults : (state.realResults.groups || {});
         }
 
+        // ALGORITMO DE ORDENAMIENTO (RESPETA EL ORDEN IMPRESO)
+        function sortMatchesCustom(a, b) {
+            const diff = new Date(a.dateIso) - new Date(b.dateIso);
+            if (diff !== 0) return diff; // Si la hora es distinta, ordena por hora.
+            
+            // Si empatan en hora (Jornada 3 simultánea), dictamos quién va primero
+            // basándonos en el ID interno del equipo, replicando la hoja PDF al 100%
+            const tieBreakerFirst = {
+                'A': 4, 'B': 3, 'C': 4, 'D': 3, 'E': 4, 'F': 3,
+                'G': 3, 'H': 4, 'I': 3, 'J': 4, 'K': 3, 'L': 3
+            };
+            const aIdNum = parseInt(a.id.split('-')[1]);
+            const bIdNum = parseInt(b.id.split('-')[1]);
+            const firstId = tieBreakerFirst[a.grupo];
+            
+            if (aIdNum === firstId) return -1;
+            if (bIdNum === firstId) return 1;
+            return 0;
+        }
+
         function toggleMatchCenter(tab) {
             currentMatchCenterTab = tab;
             document.getElementById('btn-tab-history').classList.toggle('active', tab === 'history');
