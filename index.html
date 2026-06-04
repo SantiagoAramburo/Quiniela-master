@@ -1995,8 +1995,11 @@
             }
         }
 
+        let countdownInitialized = false;
+
         function updateCountdown() {
-            const kickoff = new Date('2026-06-11T13:00:00-06:00').getTime();
+            // 11 de junio 2026 a las 13:00 CDMX (UTC-5 en junio/CDT)
+            const kickoff = new Date('2026-06-11T13:00:00-05:00').getTime();
             const now = new Date().getTime();
             const diff = kickoff - now;
 
@@ -2005,15 +2008,20 @@
             const cdMins = document.getElementById('cd-mins');
             const cdSecs = document.getElementById('cd-secs');
 
-            if (!cdDays || !cdHours || !cdMins || !cdSecs) return;
+            if (!cdDays || !cdHours || !cdMins || !cdSecs) {
+                if (!countdownInitialized) console.warn('Elementos del countdown no encontrados aún.');
+                return;
+            }
+
+            countdownInitialized = true;
 
             if (diff <= 0) {
-                cdDays.innerText = '00';
-                cdHours.innerText = '00';
-                cdMins.innerText = '00';
-                cdSecs.innerText = '00';
+                cdDays.textContent = '00';
+                cdHours.textContent = '00';
+                cdMins.textContent = '00';
+                cdSecs.textContent = '00';
                 const countdownTitle = document.querySelector('.countdown-title');
-                if (countdownTitle) countdownTitle.innerText = '¡EL MUNDIAL ESTÁ EN JUEGO! ⚽🏆';
+                if (countdownTitle) countdownTitle.textContent = '¡EL MUNDIAL ESTÁ EN JUEGO! ⚽🏆';
                 return;
             }
 
@@ -2022,14 +2030,22 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            cdDays.innerText = days.toString().padStart(2, '0');
-            cdHours.innerText = hours.toString().padStart(2, '0');
-            cdMins.innerText = minutes.toString().padStart(2, '0');
-            cdSecs.innerText = seconds.toString().padStart(2, '0');
+            cdDays.textContent = days.toString().padStart(2, '0');
+            cdHours.textContent = hours.toString().padStart(2, '0');
+            cdMins.textContent = minutes.toString().padStart(2, '0');
+            cdSecs.textContent = seconds.toString().padStart(2, '0');
         }
 
-        setInterval(updateCountdown, 1000); 
-        updateCountdown(); 
+        // Ejecutar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            });
+        } else {
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
         switchTab('leaderboard');
     </script>
 </body>
