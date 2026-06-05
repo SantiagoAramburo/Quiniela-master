@@ -363,11 +363,12 @@
         .prize-split {
             display: flex; justify-content: space-between; 
             width: 100%; padding-top: 1rem; margin-top: 1rem; border-top: 1px dashed rgba(197, 179, 88, 0.4);
+            gap: 0.5rem;
         }
         .prize-item { text-align: center; flex: 1; }
-        .prize-item:first-child { border-right: 1px dashed rgba(197, 179, 88, 0.4); }
-        .prize-item .label { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; font-weight: 800; margin-bottom: 0.2rem; }
-        .prize-item .amount { font-size: 1.3rem; font-weight: 900; color: #f8fafc; }
+        .prize-item:not(:last-child) { border-right: 1px dashed rgba(197, 179, 88, 0.4); padding-right: 0.5rem; }
+        .prize-item .label { font-size: 0.70rem; color: #9ca3af; text-transform: uppercase; font-weight: 800; margin-bottom: 0.2rem; }
+        .prize-item .amount { font-size: 1.15rem; font-weight: 900; color: #f8fafc; }
 
         /* =========================================
            WIDGET CUENTA REGRESIVA
@@ -834,12 +835,16 @@
                             </div>
                             <div class="prize-split">
                                 <div class="prize-item">
-                                    <div class="label">🏆 1er Lugar (80%)</div>
+                                    <div class="label">🏆 1er (80%)</div>
                                     <div class="amount" id="prize-1st">$0</div>
                                 </div>
                                 <div class="prize-item">
-                                    <div class="label">🥈 2do Lugar (20%)</div>
+                                    <div class="label">🥈 2do (20%)</div>
                                     <div class="amount" id="prize-2nd">$0</div>
+                                </div>
+                                <div class="prize-item">
+                                    <div class="label">🥉 3er (Bono)</div>
+                                    <div class="amount" id="prize-3rd">$0</div>
                                 </div>
                             </div>
                         </div>
@@ -1868,8 +1873,19 @@
         function updatePrizePool() {
             const numUsers = Object.keys(state.users).length;
             const totalPool = numUsers * 1000;
-            const firstPlace = totalPool * 0.8;
-            const secondPlace = totalPool * 0.2;
+            
+            // Lógica de reintegro al 3er lugar ($1,000 fijos)
+            let thirdPlace = 0;
+            let remainingPool = totalPool;
+            
+            // Aseguramos que haya al menos 3 participantes para apartar el reintegro
+            if (numUsers >= 3) {
+                thirdPlace = 1000;
+                remainingPool = totalPool - thirdPlace;
+            }
+            
+            const firstPlace = remainingPool * 0.8;
+            const secondPlace = remainingPool * 0.2;
 
             const formatter = new Intl.NumberFormat('es-MX', {
                 style: 'currency', currency: 'MXN', minimumFractionDigits: 0, maximumFractionDigits: 0
@@ -1878,6 +1894,8 @@
             document.getElementById('prize-total-text').innerText = formatter.format(totalPool);
             document.getElementById('prize-1st').innerText = formatter.format(firstPlace);
             document.getElementById('prize-2nd').innerText = formatter.format(secondPlace);
+            const prize3rdEl = document.getElementById('prize-3rd');
+            if (prize3rdEl) prize3rdEl.innerText = formatter.format(thirdPlace);
         }
 
         function updateDashboardStats() {
